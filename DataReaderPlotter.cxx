@@ -14,7 +14,7 @@ DataReaderPlotter::~DataReaderPlotter()
 
 void DataReaderPlotter::InitYild()
 {
-  std::cout << "DataReaderPlotter::InitYild: Processing." << std::endl;
+  std::cout << "\nDataReaderPlotter::InitYild: Processing." << std::endl;
   Int_t NumberOfVariables = NumberOfEventVariables + NumberOfTrackVariables;
   for (Int_t i = 0; i < NumberOfVariables; i++)
   {
@@ -44,17 +44,17 @@ void DataReaderPlotter::InitYild()
     fHistogramYild[TString("hYild" + VariablesName[iVariables])] = new TH1D(Form("hYild%s", VariablesName[iVariables].Data()), Form("hYild%s;%s;%s", VariablesName[iVariables].Data(), AxisName[iVariables].first.Data(), AxisName[iVariables].second.Data()), NumberOfBinsYild[VariablesName[iVariables]], ValueRangeYild[VariablesName[iVariables]].first, ValueRangeYild[VariablesName[iVariables]].second);
     fHistogramYild[TString("hYild" + VariablesName[iVariables])]->Sumw2();
   }
-  std::cout << "DataReaderPlotter::InitYild: histograms were initialized:" << std::endl;
+  std::cout << "\nDataReaderPlotter::InitYild: histograms were initialized:" << std::endl;
   for (auto it = fHistogramYild.begin(); it != fHistogramYild.end(); it++)
   {
-    printf("%20s Nbins = %4d Xmin = %+3.2f Xmax = %+3.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
+    printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
   }
   isYildInitialized = true;
 }
 
 void DataReaderPlotter::InitKinematics()
 {
-  std::cout << "DataReaderPlotter::InitKinematics: Processing." << std::endl;
+  std::cout << "\nDataReaderPlotter::InitKinematics: Processing." << std::endl;
   Int_t NumberOfVariables = NumberOfEventVariables + NumberOfTrackVariables;
   std::map<TString, TH1D *> kinematicHists;
   for (Int_t i = 0; i < NumberOfVariables; i++)
@@ -89,10 +89,11 @@ void DataReaderPlotter::InitKinematics()
       kinematicHists[TString("hKinematics" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
     fHistogramKinematics.push_back(kinematicHists);
-    std::cout << "DataReaderPlotter::InitKinematics: histograms were initialized:" << std::endl;
+    std::cout << "\n"
+              << FlowCentralityName[iCentrality] << std::endl;
     for (auto it = fHistogramKinematics.at(iCentrality).begin(); it != fHistogramKinematics.at(iCentrality).end(); it++)
     {
-      printf("%20s Nbins = %4d Xmin = %+3.2f Xmax = %+3.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
+      printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
     }
     kinematicHists.clear();
   }
@@ -101,7 +102,7 @@ void DataReaderPlotter::InitKinematics()
 
 void DataReaderPlotter::InitCuts()
 {
-  std::cout << "DataReaderPlotter::InitCuts: Processing." << std::endl;
+  std::cout << "\nDataReaderPlotter::InitCuts: Processing." << std::endl;
   Int_t NumberOfVariables = NumberOfEventVariables + NumberOfTrackVariables;
   std::map<TString, TH1D *> cutsHists;
   for (Int_t i = 0; i < NumberOfVariables; i++)
@@ -136,10 +137,11 @@ void DataReaderPlotter::InitCuts()
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
     fHistogramCuts.push_back(cutsHists);
-    std::cout << "DataReaderPlotter::InitCuts: histograms were initialized:" << std::endl;
+    std::cout << "\n"
+              << FlowCentralityName[iCentrality] << std::endl;
     for (auto it = fHistogramCuts.at(iCentrality).begin(); it != fHistogramCuts.at(iCentrality).end(); it++)
     {
-      printf("%20s Nbins = %4d Xmin = %+3.2f Xmax = %+3.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
+      printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
     }
     cutsHists.clear();
   }
@@ -148,7 +150,7 @@ void DataReaderPlotter::InitCuts()
 
 void DataReaderPlotter::InitFlow()
 {
-  std::cout << "DataReaderPlotter::InitFlow: Processing." << std::endl;
+  std::cout << "\nDataReaderPlotter::InitFlow: Processing." << std::endl;
   std::map<TString, TProfile *> flowHists;
   Int_t NumberOfVariables = NumberOfFlowEventVariables + NumberOfFlowTrackVariables;
   for (Int_t i = 0; i < NumberOfVariables; i++)
@@ -191,7 +193,7 @@ void DataReaderPlotter::InitFlow()
     flowHists.clear();
     for (auto it = fHistogramFlow.at(iCentrality).begin(); it != fHistogramFlow.at(iCentrality).end(); it++)
     {
-      printf("%20s Nbins = %4d Xmin = %+3.2f Xmax = %+3.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
+      printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
     }
   }
   isFlowInitialized = true;
@@ -351,7 +353,7 @@ void DataReaderPlotter::ScaleAllHist(Double_t _scale)
 
 void DataReaderPlotter::ScaleYildsForAllDataset(Double_t _NumberOfFiles)
 {
-  std::cout << "DataReaderPlotter::ScaleYildsForAllDataset: Processing." << std::endl;
+  std::cout << "\nDataReaderPlotter::ScaleYildsForAllDataset: Processing." << std::endl;
   Double_t scaleModifier;
   Double_t NumberOfEvts;
   for (Int_t iVariables = 0; iVariables < NumberOfTrackVariables; iVariables++)
@@ -359,7 +361,7 @@ void DataReaderPlotter::ScaleYildsForAllDataset(Double_t _NumberOfFiles)
     NumberOfEvts = fHistogramYild["hYildB"]->Integral("width");
     scaleModifier = _NumberOfFiles * NumberOfEvts * TMath::Abs(ValueRangeYild[VariablesName[iVariables]].second - ValueRangeYild[VariablesName[iVariables]].first) / (NumberOfBinsYild[VariablesName[iVariables]]);
 
-    printf("\t(%10s) Number of files: %4.0f Number of entries in (b<3.5fm): %5.2f; AxisMin = %+3.2f; AxisMax = %+3.2f; Number of bins = %4d; Total scale 1./%3.2f.\n", VariablesName[iVariables].Data(), _NumberOfFiles, NumberOfEvts, ValueRangeYild[VariablesName[iVariables]].first, ValueRangeYild[VariablesName[iVariables]].second, NumberOfBinsYild[VariablesName[iVariables]]);
+    printf("\t(%10s) Number of files: %4.0f Number of entries in (b<3.5fm): %5.2f; AxisMin = %+3.2f; AxisMax = %+3.2f; Number of bins = %4d; Total scale 1./%3.2f.\n", VariablesName[iVariables].Data(), _NumberOfFiles, NumberOfEvts, ValueRangeYild[VariablesName[iVariables]].first, ValueRangeYild[VariablesName[iVariables]].second, NumberOfBinsYild[VariablesName[iVariables]], scaleModifier);
     for (Int_t iPID = 0; iPID < NumberOfParticles; iPID++)
     {
       fHistogramYild[TString("hYild" + VariablesName[iVariables] + ParticleName[iPID])]->Scale(1. / scaleModifier);
