@@ -1,0 +1,28 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DataReaderMain",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/home/peter/Documents/WorkLocal/MPD/macro/DataReader/build/Main",
+      // "args": ["-i","~/urqmd_ascii_50538258_450.f14","-o","test.root","-Nfiles","1","tree"],
+      "args": ["-i","~/PHQMD_AuAu11000_bin768.UniGen.root","-o","test","-Nfiles","1","--hist"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": true,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
