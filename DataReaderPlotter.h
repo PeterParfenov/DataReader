@@ -56,7 +56,7 @@ namespace dataplotter{
   const TString FlowCentralityName[]= {TString("All"), TString("Central"), TString("Midcentral"), TString("Peripheral")};
 
   // Impact parameter selection criteria (for Kinematics, Cuts, Flow)
-  const std::pair<Double_t, Double_t> FlowBRegion[] ={{0.,17.},{0.,3.5},{5.,7.},{10.,12.}};
+  const std::pair<Double_t, Double_t> FlowBRegion[] ={{0.,17.},{0.,3.4},{5.,9.},{9.,15.}};
   // Total number of impact parameter sets for the selection (for Kinematics, Cuts, Flow)
   const Int_t NumberOfBRegions = 4;
 
@@ -66,7 +66,7 @@ namespace dataplotter{
   const std::pair <Double_t, Double_t> FlowPtcut = {0.2,2.};
 
   // Rapidity gap for vn(Pt,B) calculation
-  const Double_t FlowMidRapidityCutForPt = 0.2;
+  const Double_t FlowMidRapidityCutForPt = 0.1;
   // Total number of flow harmonics that will be calculated
   const Int_t FlowNumberOfHarmonic = 2;
 
