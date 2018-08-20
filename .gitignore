@@ -1,2 +1,4 @@
 *root
 build/
+scripts/
+.gitignore

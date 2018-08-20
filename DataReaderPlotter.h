@@ -61,8 +61,8 @@ namespace dataplotter{
   const Int_t NumberOfBRegions = 4;
 
   // Sets of cuts for track selection (for Kinematics, Cuts, Flow)
-  const std::pair <Double_t, Double_t> FlowEtacut = {-1.5,1.5};
-  const std::pair <Double_t, Double_t> FlowYcut = {-1.5,1.5};
+  const std::pair <Double_t, Double_t> FlowEtacut = {-1.0,1.0};
+  const std::pair <Double_t, Double_t> FlowYcut = {-1.,1.};
   const std::pair <Double_t, Double_t> FlowPtcut = {0.2,2.};
 
   // Rapidity gap for vn(Pt,B) calculation
@@ -73,13 +73,13 @@ namespace dataplotter{
   // Number of bins for custom binning (Flow)
   const Int_t FlowNPtBins = 12;
   const Int_t FlowNEtaBins = 15;
-  const Int_t FlowNRapidityBins = 15;
+  const Int_t FlowNRapidityBins = 10;
   const Int_t FlowNBBins = 12;
 
   // Custom bin arrays (Flow)
   const Double_t FlowPtBinning [] = {0.2,0.3,0.4,0.5,0.6,0.7,0.8,1.,1.2,1.4,1.6,1.8,2.};
   const Double_t FlowEtaBinning [] = {-1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5};
-  const Double_t FlowRapidityBinning [] = {-1.5,-1.3,-1.1,-0.9,-0.7,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.1,1.3,1.5};
+  const Double_t FlowRapidityBinning [] = {-1.,-0.8,-0.6,-0.4,-0.2,0.,0.2,0.4,0.6,0.8,1.};
   const Double_t FlowBBinning [] = {0.,1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12};
 }
 

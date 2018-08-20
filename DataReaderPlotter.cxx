@@ -298,6 +298,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
 
   if (isFlowInitialized)
   {
+    Int_t wV1 = 0;
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
       if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
@@ -328,9 +329,10 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
                   }
                   if (iHarm == 0 && TMath::Abs(Rapidity) > FlowMidRapidityCutForPt)
                   {
-                    fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, TMath::Sign(TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), Rapidity), _weight);
+                    wV1 = TMath::Sign(1, Rapidity);
+                    fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, wV1 * TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
 
-                    fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "B" + ParticleName[iPID])]->Fill(_event->B, TMath::Sign(TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), Rapidity), _weight);
+                    fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "B" + ParticleName[iPID])]->Fill(_event->B, wV1 * TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
 
                   } //if midrapidity cut
                 }   //end loop over harmonics
