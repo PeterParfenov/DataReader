@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 
 #include "TROOT.h"
 #include "TFile.h"
@@ -24,6 +27,7 @@ struct FileType
 {
   Bool_t isASCII;
   Bool_t isROOT;
+  Bool_t isGZ;
   ClassDef(FileType, 0);
 };
 
@@ -31,6 +35,7 @@ struct InputFile
 {
   TFile *ROOT;
   std::ifstream ASCII;
+  FILE *File;
   ClassDef(InputFile, 0);
 };
 
@@ -53,8 +58,6 @@ public:
   void InitOutputTreeFile(TString _name);
   void InitOutputHistFile(TString _name);
   Bool_t ReadFile(TString _name);
-  void ReadUrQMD();
-  void ReadUNIGEN();
   void InitTree(TString _treeName, TString _treeTitle);
   void InitDRETree(TString _treeName, TString _treeTitle);
   void ScaleYildHists(Double_t _NumberOfFiles);
@@ -63,6 +66,11 @@ public:
 
 private:
   void FillTree();
+  void ReadUrQMD();
+  void ReadUNIGEN();
+  void ReadLAQGSM();
+  Bool_t GeneralFget(char* ss, Int_t nn);
+  Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange);
   std::map<Int_t, Int_t> InitPDGDictionary();
   void InitPlotter();
   TFile *oTreeFile = {nullptr};
