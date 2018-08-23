@@ -364,7 +364,7 @@ void DataReader::ReadGZPHSD()
     fEvent->Nevent = fCount;
     fEvent->B = fBimp;
     fEvent->Nparticles = fNTr;
-    std::cout << "DataReader::ReadLAQGSM: Event " << fEvent->Nevent
+    std::cout << "DataReader::ReadGZPHSD: Event " << fEvent->Nevent
               << "\n\tiSub = " << fISub << " iRun = " << fIRun
               << "\n\tImpact parameter: " << fEvent->B << " fm."
               << "\n\tNparticles: " << fEvent->Nparticles << std::endl;
