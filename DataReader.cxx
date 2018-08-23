@@ -25,6 +25,11 @@ Bool_t DataReader::InitInputFile(TString _name)
   {
     fFileType.isGZ = true;
   }
+  if (_name.Contains(".dat") || _name.Contains("phsd") || _name.Contains("PHSD"))
+  {
+    fFileType.isASCII = true;
+    fModelType.isPHSD = true;
+  }
   if (_name.Contains(".r12"))
   {
     fFileType.isASCII = true;
@@ -55,6 +60,21 @@ Bool_t DataReader::InitInputFile(TString _name)
     {
       std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
       return false;
+    }
+  }
+
+  if (fFileType.isASCII && fFileType.isGZ)
+  {
+    std::cout << "DataReader::InitInputFile: Input file type: GZIPPED ASCII" << std::endl;
+    if (fModelType.isPHSD)
+    {
+      std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
+      iFile.GZ = gzopen(_name.Data(), "rb");
+      if (!iFile.GZ)
+      {
+        std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+        return false;
+      }
     }
   }
 
@@ -108,6 +128,8 @@ Bool_t DataReader::ReadFile(TString _name)
     ReadUNIGEN();
   if (fFileType.isASCII && fModelType.isLAQGSM)
     ReadLAQGSM();
+  if (fFileType.isASCII && fFileType.isGZ && fModelType.isPHSD)
+    ReadGZPHSD();
 
   return true;
 }
@@ -287,7 +309,7 @@ void DataReader::ReadLAQGSM()
       }
       // std::cout << fEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << fEvent->Px[j] << " " << fEvent->Py[j] << " " << fEvent->Pz[j] << " " << str << fEvent->M[j] << std::endl;
       fEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
-      fEvent->E[j] = TMath::Sqrt(fEvent->Px[j]*fEvent->Px[j]+fEvent->Py[j]*fEvent->Py[j]+fEvent->Pz[j]*fEvent->Pz[j]+fEvent->M[j]*fEvent->M[j]);
+      fEvent->E[j] = TMath::Sqrt(fEvent->Px[j] * fEvent->Px[j] + fEvent->Py[j] * fEvent->Py[j] + fEvent->Pz[j] * fEvent->Pz[j] + fEvent->M[j] * fEvent->M[j]);
     }
     FillTree();
     fPlotter->Fill(fEvent, 1.);
@@ -295,6 +317,85 @@ void DataReader::ReadLAQGSM()
     {
       break;
     }
+  }
+}
+
+void DataReader::ReadGZPHSD()
+{
+  const Int_t fBufSize = 256;
+  char fBuffer[fBufSize];
+  Int_t res;
+  Int_t fCount = 0;
+  std::stringstream ss;
+  std::string str;
+
+  Int_t fNTr, fISub, fIRun, fIBw; // to read
+  Double_t fBimp;                 // to read
+  Int_t fNP;                      // to read
+  Int_t fipdg, fich, fipi5;       // to read
+  Double_t fP[4], fR[4];          // to read
+
+  while (!gzeof(iFile.GZ))
+  {
+    gzgets(iFile.GZ, fBuffer, fBufSize);
+    ss.str("");
+    ss.clear();
+    str = (std::string)fBuffer;
+    ss << str;
+    ss >> fNTr >> fISub >> fIRun >> fBimp >> fIBw;
+    // res = sscanf(fBuffer, "%d %d %d %e %d", &fNTr, &fISub, &fIRun, &fBimp, &fIBw);
+    // if (res != 5)
+    // {
+    //   std::cerr << "DataReader::ReadGZPHSD: Error in reading file header." << std::endl;
+    //   return;
+    // }
+    gzgets(iFile.GZ, fBuffer, fBufSize);
+    str = (std::string)fBuffer;
+    ss.str("");
+    ss.clear();
+    ss << str;
+    ss >> fNP;
+    if (fIBw == 0)
+    {
+      std::cerr << "DataReader::ReadGZPHSD: Proper weight has to be accounted!" << std::endl;
+      return;
+    }
+    fCount++;
+    fEvent->Nevent = fCount;
+    fEvent->B = fBimp;
+    fEvent->Nparticles = fNTr;
+    std::cout << "DataReader::ReadLAQGSM: Event " << fEvent->Nevent
+              << "\n\tiSub = " << fISub << " iRun = " << fIRun
+              << "\n\tImpact parameter: " << fEvent->B << " fm."
+              << "\n\tNparticles: " << fEvent->Nparticles << std::endl;
+    // << "\n\tPsiRP: " << fEvent->PsiRP << std::endl;
+
+    for (Int_t j = 0; j < fEvent->Nparticles; j++)
+    {
+      gzgets(iFile.GZ, fBuffer, fBufSize);
+      str = (std::string)fBuffer;
+      ss.str("");
+      ss.clear();
+      ss << str;
+      ss >> fipdg >> fich >> fP[1] >> fP[2] >> fP[3] >> fP[0] >> fipi5;
+      // res = sscanf(fBuffer, "%d %d %e %e %e %e %d", &fipdg, &fich, &fP[1], &fP[2], &fP[3], &fP[0], &fipi5);
+      // if (res != 7)
+      // {
+      //   std::cerr << "DataReader::ReadGZPHSD: Error in reading file tracks." << std::endl;
+      //   return;
+      // }
+      fEvent->E[j] = fP[0];
+      fEvent->Px[j] = fP[1];
+      fEvent->Py[j] = fP[2];
+      fEvent->Pz[j] = fP[3];
+      fEvent->M[j] = TMath::Sqrt(fEvent->E[j] * fEvent->E[j] + fEvent->Px[j] * fEvent->Px[j] + fEvent->Py[j] * fEvent->Py[j] + fEvent->Pz[j] * fEvent->Pz[j]);
+      fEvent->Charge[j] = fich;
+      fEvent->PID[j] = fipdg;
+    }
+    FillTree();
+    fPlotter->Fill(fEvent, 1.);
+    if (gzeof(iFile.GZ))
+      break;
   }
 }
 
@@ -553,7 +654,7 @@ Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, I
           continue;
         if (_baryonic != fLa_tab[i].A)
           continue;
-        if (fEvent->M[iTrack] < (fLa_tab[i].mass* 0.99))
+        if (fEvent->M[iTrack] < (fLa_tab[i].mass * 0.99))
           continue;
         if (fEvent->M[iTrack] > (fLa_tab[i].mass * 1.01))
           continue;

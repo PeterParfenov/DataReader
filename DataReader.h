@@ -6,8 +6,7 @@
 #include <sstream>
 #include <vector>
 #include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/zlib.hpp>
+#include <zlib.h>
 
 #include "TROOT.h"
 #include "TFile.h"
@@ -36,6 +35,7 @@ struct InputFile
   TFile *ROOT;
   std::ifstream ASCII;
   FILE *File;
+  gzFile GZ;
   ClassDef(InputFile, 0);
 };
 
@@ -69,6 +69,7 @@ private:
   void ReadUrQMD();
   void ReadUNIGEN();
   void ReadLAQGSM();
+  void ReadGZPHSD();
   Bool_t GeneralFget(char* ss, Int_t nn);
   Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange);
   std::map<Int_t, Int_t> InitPDGDictionary();
