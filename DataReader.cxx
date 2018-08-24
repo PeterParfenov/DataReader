@@ -43,74 +43,25 @@ Bool_t DataReader::InitInputFile(TString _name)
       fModelType.isPHQMD = true;
     }
   }
-  if (fFileType.isASCII && fFileType.isROOT)
-    std::cerr << "DataReader::InitInputFile: Incopetent file type." << std::endl;
-  if (fFileType.isASCII && !fFileType.isGZ)
-  {
-    std::cout << "DataReader::InitInputFile: Input file type: ASCII" << std::endl;
-    if (fModelType.isURQMD)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: UrQMD" << std::endl;
-      iFile.ASCII.open(_name.Data());
-    }
-    if (fModelType.isLAQGSM)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
-      iFile.ASCII.open(_name.Data());
-    }
-    if (fModelType.isPHSD)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
-      iFile.ASCII.open(_name.Data());
-    }
-    if (!iFile.ASCII.is_open())
-    {
-      std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-      return false;
-    }
-  }
 
-  if (fFileType.isASCII && fFileType.isGZ)
+  if (fModelType.isURQMD)
   {
-    std::cout << "DataReader::InitInputFile: Input file type: GZIPPED ASCII" << std::endl;
-    if (fModelType.isPHSD)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
-      iFile.GZ = gzopen(_name.Data(), "rb");
-    }
-    if (fModelType.isURQMD)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: UrQMD" << std::endl;
-      iFile.GZ = gzopen(_name.Data(), "rb");
-    }
-    if (fModelType.isLAQGSM)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
-      iFile.GZ = gzopen(_name.Data(), "rb");
-    }
-    if (!iFile.GZ)
-    {
-      std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-      return false;
-    }
+    std::cout << "DataReader::InitInputFile: Input model type: UrQMD" << std::endl;
   }
-
-  if (fFileType.isROOT)
+  if (fModelType.isLAQGSM)
   {
-    std::cout << "DataReader::InitInputFile: Input file type: ROOT" << std::endl;
-    if (fModelType.isPHQMD)
-    {
-      std::cout << "DataReader::InitInputFile: Input model type: PHQMD" << std::endl;
-      iFile.ROOT = new TFile(_name.Data(), "read");
-      if (iFile.ROOT->IsZombie())
-      {
-        std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-        return false;
-      }
-    }
+    std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
   }
-
-  return true;
+  if (fModelType.isPHSD)
+  {
+    std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
+  }
+  if (fModelType.isPHQMD)
+  {
+    std::cout << "DataReader::InitInputFile: Input model type: PHQMD" << std::endl;
+  }
+  Bool_t result = OpenInputFile(_name);
+  return result;
 }
 
 void DataReader::InitOutputTreeFile(TString _name)
@@ -519,12 +470,6 @@ void DataReader::InitPlotter()
   fPlotter->InitFlow();
 }
 
-Bool_t DataReader::GeneralFget(char *ss, Int_t nn)
-{
-  fgets(ss, nn, iFile.File);
-  return (Bool_t)feof(iFile.File);
-}
-
 Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange)
 {
   Int_t
@@ -720,6 +665,49 @@ std::string DataReader::GetLine()
     getline(iFile.ASCII, str);
   }
   return str;
+}
+
+Bool_t DataReader::OpenInputFile(TString _name)
+{
+  if (fFileType.isASCII && fFileType.isROOT)
+  {
+    std::cerr << "DataReader::OpenInputFile: Incopetent file type." << std::endl;
+    return false;
+  }
+  if (fFileType.isASCII)
+  {
+    if (fFileType.isGZ)
+    {
+      std::cout << "DataReader::OpenInputFile: Input file type: GZIPPED ASCII" << std::endl;
+      iFile.GZ = gzopen(_name.Data(), "rb");
+      if (!iFile.GZ)
+      {
+        std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+        return false;
+      }
+    }
+    if (!fFileType.isGZ)
+    {
+      std::cout << "DataReader::OpenInputFile: Input file type: ASCII" << std::endl;
+      iFile.ASCII.open(_name.Data());
+      if (!iFile.ASCII.is_open())
+      {
+        std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+        return false;
+      }
+    }
+  }
+  if (fFileType.isROOT)
+  {
+    std::cout << "DataReader::OpenInputFile: Input file type: ROOT" << std::endl;
+    iFile.ROOT = new TFile(_name.Data(), "read");
+    if (iFile.ROOT->IsZombie())
+    {
+      std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+      return false;
+    }
+  }
+  return true;
 }
 
 ClassImp(DataReader);

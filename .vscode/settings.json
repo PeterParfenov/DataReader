@@ -46,7 +46,10 @@
     "tuple": "cpp",
     "typeinfo": "cpp",
     "utility": "cpp",
-    "functional": "cpp"
+    "functional": "cpp",
+    "cstring": "cpp",
+    "list": "cpp",
+    "cinttypes": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -34,7 +34,6 @@ struct InputFile
 {
   TFile *ROOT;
   std::ifstream ASCII;
-  FILE *File;
   gzFile GZ;
   ClassDef(InputFile, 0);
 };
@@ -72,9 +71,9 @@ private:
   void ReadPHSD();
   Bool_t eof();
   std::string GetLine();
-  Bool_t GeneralFget(char* ss, Int_t nn);
+  Bool_t OpenInputFile(TString _name);
   Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange);
-  std::map<Int_t, Int_t> InitPDGDictionary();
+  // std::map<Int_t, Int_t> InitPDGDictionary();
   void InitPlotter();
   TFile *oTreeFile = {nullptr};
   TFile *oHistFile = {nullptr};
