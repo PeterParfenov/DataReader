@@ -69,7 +69,9 @@ private:
   void ReadUrQMD();
   void ReadUNIGEN();
   void ReadLAQGSM();
-  void ReadGZPHSD();
+  void ReadPHSD();
+  Bool_t eof();
+  std::string GetLine();
   Bool_t GeneralFget(char* ss, Int_t nn);
   Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange);
   std::map<Int_t, Int_t> InitPDGDictionary();

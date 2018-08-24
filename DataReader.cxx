@@ -25,7 +25,7 @@ Bool_t DataReader::InitInputFile(TString _name)
   {
     fFileType.isGZ = true;
   }
-  if (_name.Contains(".dat") || _name.Contains("phsd") || _name.Contains("PHSD"))
+  if (_name.Contains("phsd") || _name.Contains("PHSD"))
   {
     fFileType.isASCII = true;
     fModelType.isPHSD = true;
@@ -54,8 +54,15 @@ Bool_t DataReader::InitInputFile(TString _name)
       iFile.ASCII.open(_name.Data());
     }
     if (fModelType.isLAQGSM)
+    {
       std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
-    iFile.ASCII.open(_name.Data());
+      iFile.ASCII.open(_name.Data());
+    }
+    if (fModelType.isPHSD)
+    {
+      std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
+      iFile.ASCII.open(_name.Data());
+    }
     if (!iFile.ASCII.is_open())
     {
       std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
@@ -70,11 +77,21 @@ Bool_t DataReader::InitInputFile(TString _name)
     {
       std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
       iFile.GZ = gzopen(_name.Data(), "rb");
-      if (!iFile.GZ)
-      {
-        std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-        return false;
-      }
+    }
+    if (fModelType.isURQMD)
+    {
+      std::cout << "DataReader::InitInputFile: Input model type: UrQMD" << std::endl;
+      iFile.GZ = gzopen(_name.Data(), "rb");
+    }
+    if (fModelType.isLAQGSM)
+    {
+      std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
+      iFile.GZ = gzopen(_name.Data(), "rb");
+    }
+    if (!iFile.GZ)
+    {
+      std::cerr << "DataReader::InitInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+      return false;
     }
   }
 
@@ -128,8 +145,8 @@ Bool_t DataReader::ReadFile(TString _name)
     ReadUNIGEN();
   if (fFileType.isASCII && fModelType.isLAQGSM)
     ReadLAQGSM();
-  if (fFileType.isASCII && fFileType.isGZ && fModelType.isPHSD)
-    ReadGZPHSD();
+  if (fFileType.isASCII && fModelType.isPHSD)
+    ReadPHSD();
 
   return true;
 }
@@ -143,9 +160,9 @@ void DataReader::ReadUrQMD()
   const int skipLinesHeader = 12;
   const int skipLinesEvent = 3;
 
-  while (!iFile.ASCII.eof())
+  while (!eof())
   {
-    getline(iFile.ASCII, str);
+    str = GetLine();
     if (str.empty())
     {
       std::cerr << "DataReader::ReadUrQMD: [WARNING] line is empty. Skipping." << std::endl;
@@ -157,24 +174,24 @@ void DataReader::ReadUrQMD()
       // Skip lines
       for (Int_t j = 0; j < skipLinesEvent - 1; j++)
       {
-        getline(iFile.ASCII, str);
+        str = GetLine();
       }
       // Read impact parameter
       ss.str("");
       ss.clear();
-      getline(iFile.ASCII, str);
+      str = GetLine();
       ss << str;
       ss >> str >> fEvent->B;
-      getline(iFile.ASCII, str);
+      str = GetLine();
       // Read number of event
       ss.str("");
       ss.clear();
-      getline(iFile.ASCII, str);
+      str = GetLine();
       ss << str;
       ss >> str >> fEvent->Nevent;
       for (Int_t j = 0; j < skipLinesHeader; j++)
       {
-        getline(iFile.ASCII, str);
+        str = GetLine();
       }
 
       // Read number of particles and time
@@ -185,14 +202,14 @@ void DataReader::ReadUrQMD()
       std::cout << "DataReader::ReadUrQMD: Event " << fEvent->Nevent
                 << "\n\tImpact parameter: " << fEvent->B << " fm."
                 << "\n\tNparticles: " << fEvent->Nparticles << std::endl;
-      getline(iFile.ASCII, str);
+      str = GetLine();
       // Loop on particles on all time in this event
       Int_t i3, lcl, ncl, orr, itype;
       for (Int_t j = 0; j < fEvent->Nparticles; j++)
       {
         ss.str("");
         ss.clear();
-        getline(iFile.ASCII, str);
+        str = GetLine();
         ss << str;
         ss >> fEvent->r0[j] >> fEvent->rX[j] >> fEvent->rY[j] >> fEvent->rZ[j] >> fEvent->E[j] >> fEvent->Px[j] >> fEvent->Py[j] >> fEvent->Pz[j] >> fEvent->M[j] >> itype >> i3 >> fEvent->Charge[j] >> lcl >> ncl >> orr;
         fEvent->PID[j] = (particleURQMD.find(TMath::Abs(itype)) != particleURQMD.end()) ? TMath::Sign(particleURQMD.at(TMath::Abs(itype)), fEvent->Charge[j]) : -999.;
@@ -267,20 +284,20 @@ void DataReader::ReadLAQGSM()
   Double_t bx = 0., by = 0.;
 
   Int_t fQGSM_format_ID = 2;
-  getline(iFile.ASCII, str);
+  str = GetLine();
   // Skip lines
   for (Int_t j = 0; j < skipLinesEvent - 1; j++)
   {
-    getline(iFile.ASCII, str);
+    str = GetLine();
   }
 
-  while (!iFile.ASCII.eof())
+  while (!eof())
   {
     fEvent->CleanEvent();
     // Read impact parameter
     ss.str("");
     ss.clear();
-    getline(iFile.ASCII, str);
+    str = GetLine();
     if (str.empty())
     {
       std::cerr << "DataReader::ReadLAQGSM: [WARNING] line is empty. Skipping." << std::endl;
@@ -301,7 +318,7 @@ void DataReader::ReadLAQGSM()
     {
       ss.str("");
       ss.clear();
-      getline(iFile.ASCII, str);
+      str = GetLine();
       ss << str;
       if (fQGSM_format_ID < 3)
       {
@@ -320,7 +337,7 @@ void DataReader::ReadLAQGSM()
   }
 }
 
-void DataReader::ReadGZPHSD()
+void DataReader::ReadPHSD()
 {
   const Int_t fBufSize = 256;
   char fBuffer[fBufSize];
@@ -335,12 +352,12 @@ void DataReader::ReadGZPHSD()
   Int_t fipdg, fich, fipi5;       // to read
   Double_t fP[4], fR[4];          // to read
 
-  while (!gzeof(iFile.GZ))
+  while (!eof())
   {
-    gzgets(iFile.GZ, fBuffer, fBufSize);
+    // gzgets(iFile.GZ, fBuffer, fBufSize);
     ss.str("");
     ss.clear();
-    str = (std::string)fBuffer;
+    str = GetLine();
     ss << str;
     ss >> fNTr >> fISub >> fIRun >> fBimp >> fIBw;
     // res = sscanf(fBuffer, "%d %d %d %e %d", &fNTr, &fISub, &fIRun, &fBimp, &fIBw);
@@ -349,8 +366,9 @@ void DataReader::ReadGZPHSD()
     //   std::cerr << "DataReader::ReadGZPHSD: Error in reading file header." << std::endl;
     //   return;
     // }
-    gzgets(iFile.GZ, fBuffer, fBufSize);
-    str = (std::string)fBuffer;
+    // gzgets(iFile.GZ, fBuffer, fBufSize);
+    // str = (std::string)fBuffer;
+    str = GetLine();
     ss.str("");
     ss.clear();
     ss << str;
@@ -372,8 +390,8 @@ void DataReader::ReadGZPHSD()
 
     for (Int_t j = 0; j < fEvent->Nparticles; j++)
     {
-      gzgets(iFile.GZ, fBuffer, fBufSize);
-      str = (std::string)fBuffer;
+      // gzgets(iFile.GZ, fBuffer, fBufSize);
+      str = GetLine();
       ss.str("");
       ss.clear();
       ss << str;
@@ -673,6 +691,35 @@ Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, I
     }
   }
   return PDG;
+}
+
+Bool_t DataReader::eof()
+{
+  if (fFileType.isASCII && fFileType.isGZ)
+  {
+    return (gzeof(iFile.GZ));
+  }
+  if (fFileType.isASCII && !fFileType.isGZ)
+  {
+    return (iFile.ASCII.eof());
+  }
+  return true;
+}
+
+std::string DataReader::GetLine()
+{
+  std::string str;
+  char _buffer[256];
+  if (fFileType.isASCII && fFileType.isGZ)
+  {
+    gzgets(iFile.GZ, _buffer, 256);
+    str = (std::string)_buffer;
+  }
+  if (fFileType.isASCII && !fFileType.isGZ)
+  {
+    getline(iFile.ASCII, str);
+  }
+  return str;
 }
 
 ClassImp(DataReader);
