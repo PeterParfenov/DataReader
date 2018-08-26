@@ -57,6 +57,7 @@ void DataReaderPlotter::InitKinematics()
   std::cout << "\nDataReaderPlotter::InitKinematics: Processing." << std::endl;
   Int_t NumberOfVariables = NumberOfEventVariables + NumberOfTrackVariables;
   std::map<TString, TH1D *> kinematicHists;
+  std::map<TString, TH2D *> kinematicHists2D;
   for (Int_t i = 0; i < NumberOfVariables; i++)
   {
     NumberOfBinsKinematics[VariablesName[i]] = 100;
@@ -88,7 +89,10 @@ void DataReaderPlotter::InitKinematics()
       kinematicHists[TString("hKinematics" + FlowCentralityName[iCentrality] + VariablesName[iVariables])] = new TH1D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data()), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data(), AxisName[iVariables].first.Data(), AxisName[iVariables].second.Data()), NumberOfBinsKinematics[VariablesName[iVariables]], ValueRangeKinematics[VariablesName[iVariables]].first, ValueRangeKinematics[VariablesName[iVariables]].second);
       kinematicHists[TString("hKinematics" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[4].first.Data(), AxisName[5].first.Data()), NumberOfBinsKinematics[VariablesName[4]], ValueRangeKinematics[VariablesName[4]].first, ValueRangeKinematics[VariablesName[4]].second, NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[5]].first, ValueRangeKinematics[VariablesName[5]].second);
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BMULT")] -> Sumw2();
     fHistogramKinematics.push_back(kinematicHists);
+    fHistogramKinematics2D.push_back(kinematicHists2D);
     std::cout << "\n"
               << FlowCentralityName[iCentrality] << std::endl;
     for (auto it = fHistogramKinematics.at(iCentrality).begin(); it != fHistogramKinematics.at(iCentrality).end(); it++)
@@ -105,6 +109,7 @@ void DataReaderPlotter::InitCuts()
   std::cout << "\nDataReaderPlotter::InitCuts: Processing." << std::endl;
   Int_t NumberOfVariables = NumberOfEventVariables + NumberOfTrackVariables;
   std::map<TString, TH1D *> cutsHists;
+  std::map<TString, TH2D *> cutsHists2D;
   for (Int_t i = 0; i < NumberOfVariables; i++)
   {
     NumberOfBinsCuts[VariablesName[i]] = 100;
@@ -136,7 +141,10 @@ void DataReaderPlotter::InitCuts()
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])] = new TH1D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data()), Form("hCuts%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data(), AxisName[iVariables].first.Data(), AxisName[iVariables].second.Data()), NumberOfBinsCuts[VariablesName[iVariables]], ValueRangeCuts[VariablesName[iVariables]].first, ValueRangeCuts[VariablesName[iVariables]].second);
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
+    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hCut%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[4].first.Data(), AxisName[5].first.Data()), NumberOfBinsKinematics[VariablesName[4]], ValueRangeKinematics[VariablesName[4]].first, ValueRangeKinematics[VariablesName[4]].second, NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[5]].first, ValueRangeKinematics[VariablesName[5]].second);
+    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] -> Sumw2();
     fHistogramCuts.push_back(cutsHists);
+    fHistogramCuts2D.push_back(cutsHists2D);
     std::cout << "\n"
               << FlowCentralityName[iCentrality] << std::endl;
     for (auto it = fHistogramCuts.at(iCentrality).begin(); it != fHistogramCuts.at(iCentrality).end(); it++)
@@ -238,6 +246,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "Npart"]->Fill(_event->Nparticles, _weight);
+        fHistogramKinematics2D.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "BMULT"]->Fill(_event->B, _event->Nparticles, _weight);
         for (Int_t iParticle = 0; iParticle < _event->Nparticles; iParticle++)
         {
           for (Int_t iPID = 0; iPID < NumberOfParticles; iPID++)
@@ -270,6 +279,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "Npart"]->Fill(_event->Nparticles, _weight);
+        fHistogramCuts2D.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "BMULT"]->Fill(_event->B, _event->Nparticles, _weight);
         for (Int_t iParticle = 0; iParticle < _event->Nparticles; iParticle++)
         {
           for (Int_t iPID = 0; iPID < NumberOfParticles; iPID++)
@@ -398,6 +408,10 @@ void DataReaderPlotter::Write(TFile *_file)
       {
         it->second->Write();
       }
+      for (auto it = fHistogramKinematics2D.at(iCentrality).begin(); it != fHistogramKinematics2D.at(iCentrality).end(); it++)
+      {
+        it->second->Write();
+      }
     }
   }
   if (isCutsInitialized)
@@ -411,6 +425,10 @@ void DataReaderPlotter::Write(TFile *_file)
       _file->mkdir(directoryName.Data());
       _file->cd(directoryName.Data());
       for (auto it = fHistogramCuts.at(iCentrality).begin(); it != fHistogramCuts.at(iCentrality).end(); it++)
+      {
+        it->second->Write();
+      }
+      for (auto it = fHistogramCuts2D.at(iCentrality).begin(); it != fHistogramCuts2D.at(iCentrality).end(); it++)
       {
         it->second->Write();
       }

@@ -105,6 +105,8 @@ private:
   std::vector<std::map<TString, TH1D *>> fHistogramKinematics;
   std::vector<std::map<TString, TH1D *>> fHistogramCuts;
   std::vector<std::map<TString, TProfile *>> fHistogramFlow;
+  std::vector<std::map<TString, TH2D *>> fHistogramKinematics2D;
+  std::vector<std::map<TString, TH2D *>> fHistogramCuts2D;
   std::map<TString, std::pair<Double_t, Double_t>> ValueRangeYild;
   std::map<TString, std::pair<Double_t, Double_t>> ValueRangeKinematics;
   std::map<TString, std::pair<Double_t, Double_t>> ValueRangeFlow;
