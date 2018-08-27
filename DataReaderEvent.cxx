@@ -49,4 +49,26 @@ void DataReaderEvent::CleanEvent()
   Time = 0.;
 }
 
+DataReaderEvent& DataReaderEvent::operator=(DataReaderEvent& _event)
+  {
+    B = _event.B;
+    PsiRP = _event.PsiRP;
+    Nevent = _event.Nevent;
+    Nparticles = _event.Nparticles;
+    Time = _event.Time;
+    E = _event.E;
+    Px = _event.Px;
+    Py = _event.Py;
+    Pz = _event.Pz;
+    M = _event.M;
+    PID = _event.PID;
+    Charge = _event.Charge;
+    r0 = _event.r0;
+    rX = _event.rX;
+    rY = _event.rY;
+    rZ = _event.rZ;
+
+    return *this;
+  }
+
 ClassImp(DataReaderEvent);

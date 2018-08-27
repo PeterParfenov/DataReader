@@ -110,10 +110,9 @@ void DataReader::ReadUrQMD()
   const int skipLinesHeader = 12;
   const int skipLinesEvent = 3;
 
-  DataReaderEvent *fEventTree = new DataReaderEvent();
   if (isSetInitTree)
   {
-    InitTree(fEventTree);
+    InitTree();
   }
 
   while (!eof())
@@ -124,7 +123,6 @@ void DataReader::ReadUrQMD()
       std::cerr << "DataReader::ReadUrQMD: [WARNING] line is empty. Skipping." << std::endl;
       break;
     }
-    // fEvent->CleanEvent();
     DataReaderEvent *fEvent = new DataReaderEvent();
     if (str[0] != ' ')
     {
@@ -175,18 +173,19 @@ void DataReader::ReadUrQMD()
       }
       if (isSetInitTree)
       {
-        fEventTree = fEvent;
+        fTreeEvent = fEvent;
         FillTree();
       }
       fPlotter->Fill(fEvent, 1.);
       delete fEvent;
+      // fTreeEvent->CleanEvent();
     }
     if (iFile.ASCII.eof())
     {
       break;
     }
   }
-  delete fEventTree;
+  delete fTreeEvent;
 }
 
 void DataReader::ReadUNIGEN()
@@ -200,10 +199,9 @@ void DataReader::ReadUNIGEN()
   // Timestep taken into account
   Long_t nentries = tree->GetEntriesFast() / TimeStep;
 
-  DataReaderEvent *fEventTree = new DataReaderEvent();
   if (isSetInitTree)
   {
-    InitTree(fEventTree);
+    InitTree();
   }
 
   std::cout << nentries << std::endl;
@@ -213,6 +211,7 @@ void DataReader::ReadUNIGEN()
     // Timestep taken into account
     tree->GetEntry(TimeStep * (iEvent + 1) - 1);
     DataReaderEvent *fEvent = new DataReaderEvent();
+    fTreeEvent->CleanEvent();
 
     fEvent->B = uEvent->GetB();
     fEvent->Nevent = uEvent->GetEventNr();
@@ -236,7 +235,7 @@ void DataReader::ReadUNIGEN()
 
     if (isSetInitTree)
     {
-      fEventTree = fEvent;
+      fTreeEvent = fEvent;
       FillTree();
     }
     // Reweightning impact parameter
@@ -245,7 +244,7 @@ void DataReader::ReadUNIGEN()
   }
   delete uEvent;
   delete tree;
-  delete fEventTree;
+  delete fTreeEvent;
 }
 
 void DataReader::ReadLAQGSM()
@@ -254,10 +253,9 @@ void DataReader::ReadLAQGSM()
   std::string str;
   std::stringstream ss;
 
-  DataReaderEvent *fEventTree = new DataReaderEvent();
   if (isSetInitTree)
   {
-    InitTree(fEventTree);
+    InitTree();
   }
 
   const int skipLinesHeader = 12;
@@ -275,7 +273,7 @@ void DataReader::ReadLAQGSM()
 
   while (!eof())
   {
-    // fEvent->CleanEvent();
+    fTreeEvent->CleanEvent();
     DataReaderEvent *fEvent = new DataReaderEvent();
     // Read impact parameter
     ss.str("");
@@ -313,7 +311,7 @@ void DataReader::ReadLAQGSM()
     }
     if (isSetInitTree)
     {
-      fEventTree = fEvent;
+      fTreeEvent = fEvent;
       FillTree();
     }
     fPlotter->Fill(fEvent, 1.);
@@ -323,7 +321,7 @@ void DataReader::ReadLAQGSM()
       break;
     }
   }
-  delete fEventTree;
+  delete fTreeEvent;
 }
 
 void DataReader::ReadPHSD()
@@ -344,11 +342,12 @@ void DataReader::ReadPHSD()
   DataReaderEvent *fEventTree = new DataReaderEvent();
   if (isSetInitTree)
   {
-    InitTree(fEventTree);
+    InitTree();
   }
 
   while (!eof())
   {
+    fTreeEvent->CleanEvent();
     // gzgets(iFile.GZ, fBuffer, fBufSize);
     ss.str("");
     ss.clear();
@@ -408,7 +407,7 @@ void DataReader::ReadPHSD()
     }
     if (isSetInitTree)
     {
-      fEventTree = fEvent;
+      fTreeEvent = fEvent;
       FillTree();
     }
     fPlotter->Fill(fEvent, 1.);
@@ -416,7 +415,7 @@ void DataReader::ReadPHSD()
     if (gzeof(iFile.GZ))
       break;
   }
-  delete fEventTree;
+  delete fTreeEvent;
 }
 void DataReader::SetInitTree(TString _treeName, TString _treeTitle)
 {
@@ -439,25 +438,25 @@ void DataReader::SetInitDRETree(TString _treeName, TString _treeTitle)
   fDRETree->SetAutoSave(1000000000);
 }
 
-void DataReader::InitTree(DataReaderEvent *fEvent)
+void DataReader::InitTree()
 {
   std::cout << "DataReader::InitTree: Processing." << std::endl;
   if (!isTreeInitialized && isSetInitTree)
   {
 
-    fTree->Branch("fEvent.B", &fEvent->B, "fEvent.B/D");
-    fTree->Branch("fEvent.PsiRP", &fEvent->PsiRP, "fEvent.PsiRP/D");
-    fTree->Branch("fEvent.Nevent", &fEvent->Nevent, "fEvent.Nevent/I");
-    fTree->Branch("fEvent.Nparticles", &fEvent->Nparticles, "fEvent.Nparticles/I");
-    fTree->Branch("fEvent.Time", &fEvent->Time, "fEvent.Time/D");
+    fTree->Branch("fEvent.B", &fTreeEvent->B, "fEvent.B/D");
+    fTree->Branch("fEvent.PsiRP", &fTreeEvent->PsiRP, "fEvent.PsiRP/D");
+    fTree->Branch("fEvent.Nevent", &fTreeEvent->Nevent, "fEvent.Nevent/I");
+    fTree->Branch("fEvent.Nparticles", &fTreeEvent->Nparticles, "fEvent.Nparticles/I");
+    fTree->Branch("fEvent.Time", &fTreeEvent->Time, "fEvent.Time/D");
 
-    fTree->Branch("fEvent.E", fEvent->E, "fEvent.E[fEvent.Nparticles]/D");
-    fTree->Branch("fEvent.Px", fEvent->Px, "fEvent.Px[fEvent.Nparticles]/D");
-    fTree->Branch("fEvent.Py", fEvent->Py, "fEvent.Py[fEvent.Nparticles]/D");
-    fTree->Branch("fEvent.Pz", fEvent->Pz, "fEvent.Pz[fEvent.Nparticles]/D");
-    fTree->Branch("fEvent.M", fEvent->M, "fEvent.M[fEvent.Nparticles]/D");
-    fTree->Branch("fEvent.PID", fEvent->PID, "fEvent.PID[fEvent.Nparticles]/I");
-    fTree->Branch("fEvent.Charge", fEvent->Charge, "fEvent.Charge[fEvent.Nparticles]/I");
+    fTree->Branch("fEvent.E", fTreeEvent->E, "fEvent.E[fEvent.Nparticles]/D");
+    fTree->Branch("fEvent.Px", fTreeEvent->Px, "fEvent.Px[fEvent.Nparticles]/D");
+    fTree->Branch("fEvent.Py", fTreeEvent->Py, "fEvent.Py[fEvent.Nparticles]/D");
+    fTree->Branch("fEvent.Pz", fTreeEvent->Pz, "fEvent.Pz[fEvent.Nparticles]/D");
+    fTree->Branch("fEvent.M", fTreeEvent->M, "fEvent.M[fEvent.Nparticles]/D");
+    fTree->Branch("fEvent.PID", fTreeEvent->PID, "fEvent.PID[fEvent.Nparticles]/I");
+    fTree->Branch("fEvent.Charge", fTreeEvent->Charge, "fEvent.Charge[fEvent.Nparticles]/I");
     isTreeInitialized = true;
   }
   else

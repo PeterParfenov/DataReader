@@ -64,7 +64,7 @@ public:
   void WriteHist();
 
 private:
-  void InitTree(DataReaderEvent *fEvent);
+  void InitTree();
   void InitDRETree(DataReaderEvent *fEvent);
   void FillTree();
   void ReadUrQMD();
@@ -88,7 +88,7 @@ private:
 protected:
   FileType fFileType;
   ModelType fModelType;
-  // DataReaderEvent *fEvent;
+  DataReaderEvent *fTreeEvent;
   Bool_t isTreeInitialized = false;
   Bool_t isDRETreeInitialized = false;
   Bool_t isOutputTreeFileInitialized = false;

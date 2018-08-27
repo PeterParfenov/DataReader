@@ -18,6 +18,7 @@ public:
   DataReaderEvent();
   ~DataReaderEvent();
   void CleanEvent();
+  DataReaderEvent& operator=(DataReaderEvent& _event);
   Double_t B;
   Double_t PsiRP;
   Int_t Nevent;
