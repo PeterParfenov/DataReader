@@ -114,12 +114,13 @@ void DataReader::ReadUrQMD()
   while (!eof())
   {
     str = GetLine();
+    DataReaderEvent *lEvent = new DataReaderEvent();
     if (str.empty())
     {
       std::cerr << "DataReader::ReadUrQMD: [WARNING] line is empty. Skipping." << std::endl;
       break;
     }
-    fEvent->CleanEvent();
+    // fEvent->CleanEvent();
     if (str[0] != ' ')
     {
       // Skip lines
@@ -132,14 +133,14 @@ void DataReader::ReadUrQMD()
       ss.clear();
       str = GetLine();
       ss << str;
-      ss >> str >> fEvent->B;
+      ss >> str >> lEvent->B;
       str = GetLine();
       // Read number of event
       ss.str("");
       ss.clear();
       str = GetLine();
       ss << str;
-      ss >> str >> fEvent->Nevent;
+      ss >> str >> lEvent->Nevent;
       for (Int_t j = 0; j < skipLinesHeader; j++)
       {
         str = GetLine();
@@ -149,26 +150,28 @@ void DataReader::ReadUrQMD()
       ss.str("");
       ss.clear();
       ss << str;
-      ss >> fEvent->Nparticles >> fEvent->Time;
-      std::cout << "DataReader::ReadUrQMD: Event " << fEvent->Nevent
-                << "\n\tImpact parameter: " << fEvent->B << " fm."
-                << "\n\tNparticles: " << fEvent->Nparticles << std::endl;
+      ss >> lEvent->Nparticles >> lEvent->Time;
+      std::cout << "DataReader::ReadUrQMD: Event " << lEvent->Nevent
+                << "\n\tImpact parameter: " << lEvent->B << " fm."
+                << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
       str = GetLine();
       // Loop on particles on all time in this event
       Int_t i3, lcl, ncl, orr, itype;
-      for (Int_t j = 0; j < fEvent->Nparticles; j++)
+      for (Int_t j = 0; j < lEvent->Nparticles; j++)
       {
         ss.str("");
         ss.clear();
         str = GetLine();
         ss << str;
-        ss >> fEvent->r0[j] >> fEvent->rX[j] >> fEvent->rY[j] >> fEvent->rZ[j] >> fEvent->E[j] >> fEvent->Px[j] >> fEvent->Py[j] >> fEvent->Pz[j] >> fEvent->M[j] >> itype >> i3 >> fEvent->Charge[j] >> lcl >> ncl >> orr;
-        fEvent->PID[j] = (particleURQMD.find(TMath::Abs(itype)) != particleURQMD.end()) ? TMath::Sign(particleURQMD.at(TMath::Abs(itype)), fEvent->Charge[j]) : -999.;
-        if (fEvent->PID[j] > 3122 || fEvent->Charge[j] > 10)
-          std::cout << "PID: " << fEvent->PID[j] << " Charge: " << fEvent->Charge[j] << std::endl;
+        ss >> lEvent->r0[j] >> lEvent->rX[j] >> lEvent->rY[j] >> lEvent->rZ[j] >> lEvent->E[j] >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j] >> itype >> i3 >> lEvent->Charge[j] >> lcl >> ncl >> orr;
+        lEvent->PID[j] = (particleURQMD.find(TMath::Abs(itype)) != particleURQMD.end()) ? TMath::Sign(particleURQMD.at(TMath::Abs(itype)), lEvent->Charge[j]) : -999.;
+        if (lEvent->PID[j] > 3122 || lEvent->Charge[j] > 10)
+          std::cout << "PID: " << lEvent->PID[j] << " Charge: " << lEvent->Charge[j] << std::endl;
       }
+      fPlotter->Fill(lEvent, 1.);
+      fEvent = lEvent;
       FillTree();
-      fPlotter->Fill(fEvent, 1.);
+      delete lEvent;
     }
     if (iFile.ASCII.eof())
     {
@@ -195,29 +198,33 @@ void DataReader::ReadUNIGEN()
     // Timestep taken into account
     tree->GetEntry(TimeStep * (iEvent + 1) - 1);
 
-    fEvent->B = uEvent->GetB();
-    fEvent->Nevent = uEvent->GetEventNr();
-    fEvent->Nparticles = uEvent->GetNpa();
-    fEvent->Time = uEvent->GetStepT();
+    DataReaderEvent *lEvent = new DataReaderEvent();
 
-    std::cout << "DataReader::ReadPHQMD: Event " << fEvent->Nevent
-              << "\n\tImpact parameter: " << fEvent->B << " fm."
-              << "\n\tNparticles: " << fEvent->Nparticles
-              << "\n\tTime: " << fEvent->Time << std::endl;
-    for (Int_t iTrack = 0; iTrack < fEvent->Nparticles; iTrack++)
+    lEvent->B = uEvent->GetB();
+    lEvent->Nevent = uEvent->GetEventNr();
+    lEvent->Nparticles = uEvent->GetNpa();
+    lEvent->Time = uEvent->GetStepT();
+
+    std::cout << "DataReader::ReadPHQMD: Event " << lEvent->Nevent
+              << "\n\tImpact parameter: " << lEvent->B << " fm."
+              << "\n\tNparticles: " << lEvent->Nparticles
+              << "\n\tTime: " << lEvent->Time << std::endl;
+    for (Int_t iTrack = 0; iTrack < lEvent->Nparticles; iTrack++)
     {
       uParticle = uEvent->GetParticle(iTrack);
-      fEvent->E[iTrack] = uParticle->E();
-      fEvent->Px[iTrack] = uParticle->Px();
-      fEvent->Py[iTrack] = uParticle->Py();
-      fEvent->Pz[iTrack] = uParticle->Pz();
-      fEvent->PID[iTrack] = uParticle->GetPdg();
-      fEvent->M[iTrack] = TMath::Sqrt(fEvent->E[iTrack] * fEvent->E[iTrack] - fEvent->Px[iTrack] * fEvent->Px[iTrack] - fEvent->Py[iTrack] * fEvent->Py[iTrack] - fEvent->Pz[iTrack] * fEvent->Pz[iTrack]);
+      lEvent->E[iTrack] = uParticle->E();
+      lEvent->Px[iTrack] = uParticle->Px();
+      lEvent->Py[iTrack] = uParticle->Py();
+      lEvent->Pz[iTrack] = uParticle->Pz();
+      lEvent->PID[iTrack] = uParticle->GetPdg();
+      lEvent->M[iTrack] = TMath::Sqrt(lEvent->E[iTrack] * lEvent->E[iTrack] - lEvent->Px[iTrack] * lEvent->Px[iTrack] - lEvent->Py[iTrack] * lEvent->Py[iTrack] - lEvent->Pz[iTrack] * lEvent->Pz[iTrack]);
     }
 
-    FillTree();
     // Reweightning impact parameter
-    fPlotter->Fill(fEvent, 2 * TMath::Pi() * fEvent->B * 0.025);
+    fPlotter->Fill(lEvent, 2 * TMath::Pi() * lEvent->B * 0.025);
+    fEvent = lEvent;
+    FillTree();
+    delete lEvent;
   }
   delete uEvent;
   delete tree;
@@ -244,7 +251,8 @@ void DataReader::ReadLAQGSM()
 
   while (!eof())
   {
-    fEvent->CleanEvent();
+    DataReaderEvent *lEvent = new DataReaderEvent();
+    // fEvent->CleanEvent();
     // Read impact parameter
     ss.str("");
     ss.clear();
@@ -255,17 +263,17 @@ void DataReader::ReadLAQGSM()
       break;
     }
     ss << str;
-    ss >> fEvent->Nevent >> fEvent->Nparticles >> fEvent->B >> bx >> by;
-    fEvent->PsiRP = TMath::ATan2(by, bx);
-    std::cout << "DataReader::ReadLAQGSM: Event " << fEvent->Nevent
-              << "\n\tImpact parameter: " << fEvent->B << " fm."
-              << "\n\tNparticles: " << fEvent->Nparticles
-              << "\n\tPsiRP: " << fEvent->PsiRP << std::endl;
+    ss >> lEvent->Nevent >> lEvent->Nparticles >> lEvent->B >> bx >> by;
+    lEvent->PsiRP = TMath::ATan2(by, bx);
+    std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
+              << "\n\tImpact parameter: " << lEvent->B << " fm."
+              << "\n\tNparticles: " << lEvent->Nparticles
+              << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
 
     // Loop on particles on all time in this event
     Int_t iLeptonic = 0, iStrange = 0, iBaryonic = 0, iCode = 0, iCode1 = 0, iCode2 = 0;
     Double_t pza = 0., pzb = 0;
-    for (Int_t j = 0; j < fEvent->Nparticles; j++)
+    for (Int_t j = 0; j < lEvent->Nparticles; j++)
     {
       ss.str("");
       ss.clear();
@@ -273,14 +281,16 @@ void DataReader::ReadLAQGSM()
       ss << str;
       if (fQGSM_format_ID < 3)
       {
-        ss >> fEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> fEvent->Px[j] >> fEvent->Py[j] >> fEvent->Pz[j] >> str >> fEvent->M[j];
+        ss >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> str >> lEvent->M[j];
       }
-      // std::cout << fEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << fEvent->Px[j] << " " << fEvent->Py[j] << " " << fEvent->Pz[j] << " " << str << fEvent->M[j] << std::endl;
-      fEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
-      fEvent->E[j] = TMath::Sqrt(fEvent->Px[j] * fEvent->Px[j] + fEvent->Py[j] * fEvent->Py[j] + fEvent->Pz[j] * fEvent->Pz[j] + fEvent->M[j] * fEvent->M[j]);
+      // std::cout << lEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << lEvent->Px[j] << " " << lEvent->Py[j] << " " << lEvent->Pz[j] << " " << str << lEvent->M[j] << std::endl;
+      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
+      lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
     }
+    fPlotter->Fill(lEvent, 1.);
+    fEvent = lEvent;
     FillTree();
-    fPlotter->Fill(fEvent, 1.);
+    delete lEvent;
     if (iFile.ASCII.eof())
     {
       break;
@@ -305,6 +315,7 @@ void DataReader::ReadPHSD()
 
   while (!eof())
   {
+    DataReaderEvent *lEvent = new DataReaderEvent();
     // gzgets(iFile.GZ, fBuffer, fBufSize);
     ss.str("");
     ss.clear();
@@ -330,16 +341,16 @@ void DataReader::ReadPHSD()
       return;
     }
     fCount++;
-    fEvent->Nevent = fCount;
-    fEvent->B = fBimp;
-    fEvent->Nparticles = fNTr;
-    std::cout << "DataReader::ReadGZPHSD: Event " << fEvent->Nevent
+    lEvent->Nevent = fCount;
+    lEvent->B = fBimp;
+    lEvent->Nparticles = fNTr;
+    std::cout << "DataReader::ReadGZPHSD: Event " << lEvent->Nevent
               << "\n\tiSub = " << fISub << " iRun = " << fIRun
-              << "\n\tImpact parameter: " << fEvent->B << " fm."
-              << "\n\tNparticles: " << fEvent->Nparticles << std::endl;
-    // << "\n\tPsiRP: " << fEvent->PsiRP << std::endl;
+              << "\n\tImpact parameter: " << lEvent->B << " fm."
+              << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
+    // << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
 
-    for (Int_t j = 0; j < fEvent->Nparticles; j++)
+    for (Int_t j = 0; j < lEvent->Nparticles; j++)
     {
       // gzgets(iFile.GZ, fBuffer, fBufSize);
       str = GetLine();
@@ -353,16 +364,18 @@ void DataReader::ReadPHSD()
       //   std::cerr << "DataReader::ReadGZPHSD: Error in reading file tracks." << std::endl;
       //   return;
       // }
-      fEvent->E[j] = fP[0];
-      fEvent->Px[j] = fP[1];
-      fEvent->Py[j] = fP[2];
-      fEvent->Pz[j] = fP[3];
-      fEvent->M[j] = TMath::Sqrt(fEvent->E[j] * fEvent->E[j] + fEvent->Px[j] * fEvent->Px[j] + fEvent->Py[j] * fEvent->Py[j] + fEvent->Pz[j] * fEvent->Pz[j]);
-      fEvent->Charge[j] = fich;
-      fEvent->PID[j] = fipdg;
+      lEvent->E[j] = fP[0];
+      lEvent->Px[j] = fP[1];
+      lEvent->Py[j] = fP[2];
+      lEvent->Pz[j] = fP[3];
+      lEvent->M[j] = TMath::Sqrt(lEvent->E[j] * lEvent->E[j] + lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j]);
+      lEvent->Charge[j] = fich;
+      lEvent->PID[j] = fipdg;
     }
+    fPlotter->Fill(lEvent, 1.);
+    fEvent = lEvent;
     FillTree();
-    fPlotter->Fill(fEvent, 1.);
+    delete lEvent;
     if (gzeof(iFile.GZ))
       break;
   }

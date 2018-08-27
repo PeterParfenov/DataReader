@@ -34,6 +34,7 @@ public:
   Double_t *rX;
   Double_t *rY;
   Double_t *rZ;
+  DataReaderEvent& operator=(DataReaderEvent& _event);
 
 private:
   const ULong_t maxCapasity = 2500;
