@@ -76,7 +76,7 @@ int main(int argc, char **argv)
   }
 
   DataReader *dR = new DataReader();
-  dR->InitTree("tree", "Basic QA tree");
+  if (isTree) dR->SetInitTree("tree", "Basic QA tree");
   // dR->InitDRETree("DRETree", "Basic QA tree w/ DataReaderEvent class");
   if (isTree) dR->InitOutputTreeFile(outFileName);
   if (isHist) dR->InitOutputHistFile(outFileName);

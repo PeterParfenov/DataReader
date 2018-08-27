@@ -2,7 +2,6 @@
 
 DataReader::DataReader()
 {
-  fEvent = new DataReaderEvent();
 }
 
 DataReader::~DataReader()
@@ -111,6 +110,12 @@ void DataReader::ReadUrQMD()
   const int skipLinesHeader = 12;
   const int skipLinesEvent = 3;
 
+  DataReaderEvent *fEventTree = new DataReaderEvent();
+  if (isSetInitTree)
+  {
+    InitTree(fEventTree);
+  }
+
   while (!eof())
   {
     str = GetLine();
@@ -119,7 +124,8 @@ void DataReader::ReadUrQMD()
       std::cerr << "DataReader::ReadUrQMD: [WARNING] line is empty. Skipping." << std::endl;
       break;
     }
-    fEvent->CleanEvent();
+    // fEvent->CleanEvent();
+    DataReaderEvent *fEvent = new DataReaderEvent();
     if (str[0] != ' ')
     {
       // Skip lines
@@ -167,14 +173,20 @@ void DataReader::ReadUrQMD()
         if (fEvent->PID[j] > 3122 || fEvent->Charge[j] > 10)
           std::cout << "PID: " << fEvent->PID[j] << " Charge: " << fEvent->Charge[j] << std::endl;
       }
-      FillTree();
+      if (isSetInitTree)
+      {
+        fEventTree = fEvent;
+        FillTree();
+      }
       fPlotter->Fill(fEvent, 1.);
+      delete fEvent;
     }
     if (iFile.ASCII.eof())
     {
       break;
     }
   }
+  delete fEventTree;
 }
 
 void DataReader::ReadUNIGEN()
@@ -188,12 +200,19 @@ void DataReader::ReadUNIGEN()
   // Timestep taken into account
   Long_t nentries = tree->GetEntriesFast() / TimeStep;
 
+  DataReaderEvent *fEventTree = new DataReaderEvent();
+  if (isSetInitTree)
+  {
+    InitTree(fEventTree);
+  }
+
   std::cout << nentries << std::endl;
   tree->SetBranchAddress("event", &uEvent);
   for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
   {
     // Timestep taken into account
     tree->GetEntry(TimeStep * (iEvent + 1) - 1);
+    DataReaderEvent *fEvent = new DataReaderEvent();
 
     fEvent->B = uEvent->GetB();
     fEvent->Nevent = uEvent->GetEventNr();
@@ -215,12 +234,18 @@ void DataReader::ReadUNIGEN()
       fEvent->M[iTrack] = TMath::Sqrt(fEvent->E[iTrack] * fEvent->E[iTrack] - fEvent->Px[iTrack] * fEvent->Px[iTrack] - fEvent->Py[iTrack] * fEvent->Py[iTrack] - fEvent->Pz[iTrack] * fEvent->Pz[iTrack]);
     }
 
-    FillTree();
+    if (isSetInitTree)
+    {
+      fEventTree = fEvent;
+      FillTree();
+    }
     // Reweightning impact parameter
     fPlotter->Fill(fEvent, 2 * TMath::Pi() * fEvent->B * 0.025);
+    delete fEvent;
   }
   delete uEvent;
   delete tree;
+  delete fEventTree;
 }
 
 void DataReader::ReadLAQGSM()
@@ -228,6 +253,12 @@ void DataReader::ReadLAQGSM()
   std::cout << "DataReader::ReadLAQGSM: Processing." << std::endl;
   std::string str;
   std::stringstream ss;
+
+  DataReaderEvent *fEventTree = new DataReaderEvent();
+  if (isSetInitTree)
+  {
+    InitTree(fEventTree);
+  }
 
   const int skipLinesHeader = 12;
   const int skipLinesEvent = 5;
@@ -244,7 +275,8 @@ void DataReader::ReadLAQGSM()
 
   while (!eof())
   {
-    fEvent->CleanEvent();
+    // fEvent->CleanEvent();
+    DataReaderEvent *fEvent = new DataReaderEvent();
     // Read impact parameter
     ss.str("");
     ss.clear();
@@ -276,16 +308,22 @@ void DataReader::ReadLAQGSM()
         ss >> fEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> fEvent->Px[j] >> fEvent->Py[j] >> fEvent->Pz[j] >> str >> fEvent->M[j];
       }
       // std::cout << fEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << fEvent->Px[j] << " " << fEvent->Py[j] << " " << fEvent->Pz[j] << " " << str << fEvent->M[j] << std::endl;
-      fEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
+      fEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange, fEvent);
       fEvent->E[j] = TMath::Sqrt(fEvent->Px[j] * fEvent->Px[j] + fEvent->Py[j] * fEvent->Py[j] + fEvent->Pz[j] * fEvent->Pz[j] + fEvent->M[j] * fEvent->M[j]);
     }
-    FillTree();
+    if (isSetInitTree)
+    {
+      fEventTree = fEvent;
+      FillTree();
+    }
     fPlotter->Fill(fEvent, 1.);
+    delete fEvent;
     if (iFile.ASCII.eof())
     {
       break;
     }
   }
+  delete fEventTree;
 }
 
 void DataReader::ReadPHSD()
@@ -302,6 +340,12 @@ void DataReader::ReadPHSD()
   Int_t fNP;                      // to read
   Int_t fipdg, fich, fipi5;       // to read
   Double_t fP[4], fR[4];          // to read
+
+  DataReaderEvent *fEventTree = new DataReaderEvent();
+  if (isSetInitTree)
+  {
+    InitTree(fEventTree);
+  }
 
   while (!eof())
   {
@@ -330,6 +374,7 @@ void DataReader::ReadPHSD()
       return;
     }
     fCount++;
+    DataReaderEvent *fEvent = new DataReaderEvent();
     fEvent->Nevent = fCount;
     fEvent->B = fBimp;
     fEvent->Nparticles = fNTr;
@@ -361,20 +406,44 @@ void DataReader::ReadPHSD()
       fEvent->Charge[j] = fich;
       fEvent->PID[j] = fipdg;
     }
-    FillTree();
+    if (isSetInitTree)
+    {
+      fEventTree = fEvent;
+      FillTree();
+    }
     fPlotter->Fill(fEvent, 1.);
+    delete fEvent;
     if (gzeof(iFile.GZ))
       break;
   }
+  delete fEventTree;
+}
+void DataReader::SetInitTree(TString _treeName, TString _treeTitle)
+{
+  std::cout << "DataReader::SetInitTree: Processing." << std::endl;
+  isSetInitTree = true;
+
+  TString _name = (_treeName == "") ? "tree" : _treeName;
+  TString _title = (_treeTitle == "") ? _name : _treeTitle;
+  fTree = new TTree(_name.Data(), _treeTitle.Data());
 }
 
-void DataReader::InitTree(TString _treeName, TString _treeTitle = "")
+void DataReader::SetInitDRETree(TString _treeName, TString _treeTitle)
+{
+  std::cout << "DataReader::SetInitDRETree: Processing." << std::endl;
+  isSetInitDRETree = true;
+
+  TString _name = (_treeName == "") ? "tree" : _treeName;
+  TString _title = (_treeTitle == "") ? _name : _treeTitle;
+  fDRETree = new TTree(_name.Data(), _treeTitle.Data());
+  fDRETree->SetAutoSave(1000000000);
+}
+
+void DataReader::InitTree(DataReaderEvent *fEvent)
 {
   std::cout << "DataReader::InitTree: Processing." << std::endl;
-  if (!isTreeInitialized)
+  if (!isTreeInitialized && isSetInitTree)
   {
-    TString _name = (_treeName == "") ? "tree" : _treeName;
-    fTree = new TTree(_name.Data(), _treeTitle.Data());
 
     fTree->Branch("fEvent.B", &fEvent->B, "fEvent.B/D");
     fTree->Branch("fEvent.PsiRP", &fEvent->PsiRP, "fEvent.PsiRP/D");
@@ -393,25 +462,21 @@ void DataReader::InitTree(TString _treeName, TString _treeTitle = "")
   }
   else
   {
-    std::cerr << "DataReader::InitTree: [WARNING] TTree is already initialized." << std::endl;
+    // std::cerr << "DataReader::InitTree: [WARNING] TTree is already initialized." << std::endl;
   }
 }
 
-void DataReader::InitDRETree(TString _treeName, TString _treeTitle = "")
+void DataReader::InitDRETree(DataReaderEvent *fEvent)
 {
   std::cout << "DataReader::InitDRETree: Processing." << std::endl;
-  if (!isDRETreeInitialized)
+  if (!isDRETreeInitialized && isSetInitDRETree)
   {
-    TString _name = (_treeName == "") ? "DRETree" : _treeName;
-    fDRETree = new TTree(_name.Data(), _treeTitle.Data());
-    fDRETree->SetAutoSave(1000000000);
-
     fDRETree->Branch("fEvent", &fEvent);
     isDRETreeInitialized = true;
   }
   else
   {
-    std::cerr << "DataReader::InitDRETree: [WARNING] TTree is already initialized." << std::endl;
+    // std::cerr << "DataReader::InitDRETree: [WARNING] TTree is already initialized." << std::endl;
   }
 }
 
@@ -470,7 +535,7 @@ void DataReader::InitPlotter()
   fPlotter->InitFlow();
 }
 
-Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange)
+Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, DataReaderEvent *fEvent)
 {
   Int_t
       PDG = -9999,

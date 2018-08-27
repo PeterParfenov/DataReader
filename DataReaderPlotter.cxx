@@ -99,6 +99,10 @@ void DataReaderPlotter::InitKinematics()
     {
       printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
     }
+    for (auto it = fHistogramKinematics2D.at(iCentrality).begin(); it != fHistogramKinematics2D.at(iCentrality).end(); it++)
+    {
+      printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
+    }
     kinematicHists.clear();
   }
   isKinematicsInitialized = true;
@@ -148,6 +152,10 @@ void DataReaderPlotter::InitCuts()
     std::cout << "\n"
               << FlowCentralityName[iCentrality] << std::endl;
     for (auto it = fHistogramCuts.at(iCentrality).begin(); it != fHistogramCuts.at(iCentrality).end(); it++)
+    {
+      printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
+    }
+    for (auto it = fHistogramCuts2D.at(iCentrality).begin(); it != fHistogramCuts2D.at(iCentrality).end(); it++)
     {
       printf("%40s Nbins = %4d Xmin = %+5.2f Xmax = %+5.2f\n", it->second->GetName(), it->second->GetNbinsX(), it->second->GetXaxis()->GetXmin(), it->second->GetXaxis()->GetXmax());
     }
@@ -331,13 +339,13 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
                 {
                   fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Rapidity" + ParticleName[iPID])]->Fill(Rapidity, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
                   fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Eta" + ParticleName[iPID])]->Fill(Eta, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
-                  if (iHarm != 0)
+                  if (iHarm != 0 || iHarm != 2)
                   {
                     fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
 
                     fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "B" + ParticleName[iPID])]->Fill(_event->B, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
                   }
-                  if (iHarm == 0 && TMath::Abs(Rapidity) > FlowMidRapidityCutForPt)
+                  if ( (iHarm == 0 || iHarm == 2) && TMath::Abs(Rapidity) > FlowMidRapidityCutForPt)
                   {
                     wV1 = TMath::Sign(1, Rapidity);
                     fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, wV1 * TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
@@ -383,15 +391,21 @@ void DataReaderPlotter::ScaleYildsForAllDataset(Double_t _NumberOfFiles)
 
 void DataReaderPlotter::Write(TFile *_file)
 {
+  int tSize, tSizeTotal;
+  tSizeTotal = 0.;
   TString directoryName;
   _file->cd();
   if (isYildInitialized)
   {
     _file->mkdir("Yild");
     _file->cd("Yild");
+    // std::cout << "Map size: " << fHistogramYild.size() << std::endl;
+    std::cout << std::endl;
     for (auto it = fHistogramYild.begin(); it != fHistogramYild.end(); it++)
     {
-      it->second->Write();
+      tSize = it->second->Write();
+      std::cout << "\tSize of " << it->first << ": " << tSize << std::endl;
+      tSizeTotal += tSize;
     }
   }
   if (isKinematicsInitialized)
@@ -404,13 +418,21 @@ void DataReaderPlotter::Write(TFile *_file)
       directoryName = "Kinematics/" + FlowCentralityName[iCentrality];
       _file->mkdir(directoryName.Data());
       _file->cd(directoryName.Data());
+      // std::cout << "\nMap size: " << fHistogramKinematics.size() << std::endl;
+      std::cout << std::endl;
       for (auto it = fHistogramKinematics.at(iCentrality).begin(); it != fHistogramKinematics.at(iCentrality).end(); it++)
       {
-        it->second->Write();
+        tSize = it->second->Write();
+        std::cout << "\tSize of " << it->first << ": " << tSize << std::endl;
+        tSizeTotal += tSize;
       }
+      // std::cout << "\nMap size: " << fHistogramKinematics.size() << std::endl;
+      std::cout << std::endl;
       for (auto it = fHistogramKinematics2D.at(iCentrality).begin(); it != fHistogramKinematics2D.at(iCentrality).end(); it++)
       {
-        it->second->Write();
+        tSize = it->second->Write();
+        std::cout << "\tSize of " << it->first << ": " << tSize << std::endl;
+        tSizeTotal += tSize;
       }
     }
   }
@@ -424,13 +446,19 @@ void DataReaderPlotter::Write(TFile *_file)
       directoryName = "Cuts/" + FlowCentralityName[iCentrality];
       _file->mkdir(directoryName.Data());
       _file->cd(directoryName.Data());
+      std::cout << std::endl;
       for (auto it = fHistogramCuts.at(iCentrality).begin(); it != fHistogramCuts.at(iCentrality).end(); it++)
       {
-        it->second->Write();
+        tSize = it->second->Write();
+        std::cout << "\tSize of " << it->first << ": " << tSize << std::endl;
+        tSizeTotal += tSize;
       }
+      std::cout << std::endl;
       for (auto it = fHistogramCuts2D.at(iCentrality).begin(); it != fHistogramCuts2D.at(iCentrality).end(); it++)
       {
-        it->second->Write();
+        tSize = it->second->Write();
+        std::cout << "\tSize of " << it->first << ": " << tSize << std::endl;
+        tSizeTotal += tSize;
       }
     }
   }
@@ -445,13 +473,17 @@ void DataReaderPlotter::Write(TFile *_file)
       _file->mkdir(directoryName.Data());
       _file->cd(directoryName.Data());
       // std::cout << iCentrality << ": " << fHistogramFlow.at(iCentrality).size() << std::endl;
+      std::cout << std::endl;
       for (auto it = fHistogramFlow.at(iCentrality).begin(); it != fHistogramFlow.at(iCentrality).end(); it++)
       {
         // std::cout << it -> second -> GetName() << std::endl;
-        it->second->Write();
+        tSize = it->second->Write();
+        std::cout << "\tSize of " << it->first << ": " << tSize << std::endl;
+        tSizeTotal += tSize;
       }
     }
   }
+  std::cout << "Total Size: " << tSizeTotal << std::endl;
 }
 
 ClassImp(DataReaderPlotter);

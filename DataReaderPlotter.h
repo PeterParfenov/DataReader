@@ -68,7 +68,7 @@ namespace dataplotter{
   // Rapidity gap for vn(Pt,B) calculation
   const Double_t FlowMidRapidityCutForPt = 0.1;
   // Total number of flow harmonics that will be calculated
-  const Int_t FlowNumberOfHarmonic = 2;
+  const Int_t FlowNumberOfHarmonic = 3;
 
   // Number of bins for custom binning (Flow)
   const Int_t FlowNPtBins = 12;

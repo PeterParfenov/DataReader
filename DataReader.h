@@ -57,13 +57,15 @@ public:
   void InitOutputTreeFile(TString _name);
   void InitOutputHistFile(TString _name);
   Bool_t ReadFile(TString _name);
-  void InitTree(TString _treeName, TString _treeTitle);
-  void InitDRETree(TString _treeName, TString _treeTitle);
+  void SetInitTree(TString _treeName, TString _treeTitle);
+  void SetInitDRETree(TString _treeName, TString _treeTitle);
   void ScaleYildHists(Double_t _NumberOfFiles);
   void WriteTree();
   void WriteHist();
 
 private:
+  void InitTree(DataReaderEvent *fEvent);
+  void InitDRETree(DataReaderEvent *fEvent);
   void FillTree();
   void ReadUrQMD();
   void ReadUNIGEN();
@@ -72,7 +74,7 @@ private:
   Bool_t eof();
   std::string GetLine();
   Bool_t OpenInputFile(TString _name);
-  Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange);
+  Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, DataReaderEvent *fEvent);
   // std::map<Int_t, Int_t> InitPDGDictionary();
   void InitPlotter();
   TFile *oTreeFile = {nullptr};
@@ -86,11 +88,13 @@ private:
 protected:
   FileType fFileType;
   ModelType fModelType;
-  DataReaderEvent *fEvent;
+  // DataReaderEvent *fEvent;
   Bool_t isTreeInitialized = false;
   Bool_t isDRETreeInitialized = false;
   Bool_t isOutputTreeFileInitialized = false;
   Bool_t isOutputHistFileInitialized = false;
+  Bool_t isSetInitTree = false;
+  Bool_t isSetInitDRETree = false;
 
   ClassDef(DataReader, 0);
 };
