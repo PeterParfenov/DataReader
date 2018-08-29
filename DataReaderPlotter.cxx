@@ -331,7 +331,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
                 {
                   fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Rapidity" + ParticleName[iPID])]->Fill(Rapidity, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
                   fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Eta" + ParticleName[iPID])]->Fill(Eta, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
-                  if (iHarm != 0 || iHarm != 2)
+                  if (iHarm != 0 && iHarm != 2)
                   {
                     fHistogramFlow.at(iCentrality)[TString("hv" + std::to_string(iHarm + 1) + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, TMath::Cos((iHarm + 1) * (phi - _event->PsiRP)), _weight);
 
