@@ -38,7 +38,7 @@ Bool_t DataReader::InitInputFile(TString _name)
   if (_name.Contains(".root"))
   {
     fFileType.isROOT = true;
-    if (_name.Contains("UNIGEN") || _name.Contains("PHQMD"))
+    if (_name.Contains("UNIGEN") || _name.Contains("PHQMD") || _name.Contains("unigen") || _name.Contains("phqmd"))
     {
       fModelType.isPHQMD = true;
     }
@@ -217,6 +217,7 @@ void DataReader::ReadUNIGEN()
       lEvent->Py[iTrack] = uParticle->Py();
       lEvent->Pz[iTrack] = uParticle->Pz();
       lEvent->PID[iTrack] = uParticle->GetPdg();
+      if (lEvent->PID[iTrack] == 2212) lEvent->Pz[iTrack] *= -1;
       lEvent->M[iTrack] = TMath::Sqrt(lEvent->E[iTrack] * lEvent->E[iTrack] - lEvent->Px[iTrack] * lEvent->Px[iTrack] - lEvent->Py[iTrack] * lEvent->Py[iTrack] - lEvent->Pz[iTrack] * lEvent->Pz[iTrack]);
     }
 
