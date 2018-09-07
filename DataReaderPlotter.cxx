@@ -1,6 +1,43 @@
 #include "DataReaderPlotter.h"
 #include <string>
 
+#ifndef PLOTTERFUNCTIONS
+#define PLOTTERFUNCTIONS
+Int_t GetMultiplicity(DataReaderEvent *_event, Double_t _eta)
+{
+  Int_t mult = 0;
+  Double_t Eta, Pt, P;
+  for (Int_t i = 0; i < _event->Nparticles; i++)
+  {
+    Pt = TMath::Sqrt(_event->Px[i] * _event->Px[i] + _event->Py[i] * _event->Py[i]);
+    P = TMath::Sqrt(Pt * Pt + _event->Pz[i] * _event->Pz[i]);
+    Eta = 0.5 * TMath::Log((P + _event->Pz[i]) / (P - _event->Pz[i]));
+    if (Eta <= _eta)
+    {
+      mult++;
+    }
+  }
+  return mult;
+}
+
+Double_t GetEnergy(DataReaderEvent *_event, Double_t _eta)
+{
+  Double_t energy = 0.;
+  Double_t Eta, Pt, P;
+  for (Int_t i = 0; i < _event->Nparticles; i++)
+  {
+    Pt = TMath::Sqrt(_event->Px[i] * _event->Px[i] + _event->Py[i] * _event->Py[i]);
+    P = TMath::Sqrt(Pt * Pt + _event->Pz[i] * _event->Pz[i]);
+    Eta = 0.5 * TMath::Log((P + _event->Pz[i]) / (P - _event->Pz[i]));
+    if (Eta >= _eta)
+    {
+      energy += _event->E[i];
+    }
+  }
+  return energy;
+}
+#endif
+
 DataReaderPlotter::DataReaderPlotter()
 {
   isYildInitialized = false;
@@ -25,9 +62,10 @@ void DataReaderPlotter::InitYild()
   ValueRangeYild[VariablesName[1]] = {-5., 5.};                   //Eta
   ValueRangeYild[VariablesName[2]] = {-5., 5.};                   //Rapidity
   ValueRangeYild[VariablesName[3]] = {-TMath::Pi(), TMath::Pi()}; //Phi
-  ValueRangeYild[VariablesName[4]] = {0., 17.};                   //B
-  ValueRangeYild[VariablesName[5]] = {0., 2500.};                 //Npart
-  ValueRangeYild[VariablesName[6]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP
+  ValueRangeYild[VariablesName[4]] = {0., 15.};                 //Energy in forward rapidity region
+  ValueRangeYild[VariablesName[5]] = {0., 17.};                   //B
+  ValueRangeYild[VariablesName[6]] = {0., 2500.};                 //Npart
+  ValueRangeYild[VariablesName[7]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP
 
   for (Int_t iVariables = 0; iVariables < NumberOfTrackVariables; iVariables++)
   {
@@ -67,9 +105,10 @@ void DataReaderPlotter::InitKinematics()
   ValueRangeKinematics[VariablesName[1]] = {-5., 5.};                   //Eta
   ValueRangeKinematics[VariablesName[2]] = {-5., 5.};                   //Rapidity
   ValueRangeKinematics[VariablesName[3]] = {-TMath::Pi(), TMath::Pi()}; //Phi
-  ValueRangeKinematics[VariablesName[4]] = {0., 17.};                   //B
-  ValueRangeKinematics[VariablesName[5]] = {0., 2500.};                 //Npart
-  ValueRangeKinematics[VariablesName[6]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP
+  ValueRangeKinematics[VariablesName[4]] = {0., 15.};                 //Energy in forward rapidity region
+  ValueRangeKinematics[VariablesName[5]] = {0., 17.};                   //B
+  ValueRangeKinematics[VariablesName[6]] = {0., 2500.};                 //Npart
+  ValueRangeKinematics[VariablesName[7]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP
 
   for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
   {
@@ -89,8 +128,12 @@ void DataReaderPlotter::InitKinematics()
       kinematicHists[TString("hKinematics" + FlowCentralityName[iCentrality] + VariablesName[iVariables])] = new TH1D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data()), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data(), AxisName[iVariables].first.Data(), AxisName[iVariables].second.Data()), NumberOfBinsKinematics[VariablesName[iVariables]], ValueRangeKinematics[VariablesName[iVariables]].first, ValueRangeKinematics[VariablesName[iVariables]].second);
       kinematicHists[TString("hKinematics" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
-    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[4].first.Data(), AxisName[5].first.Data()), NumberOfBinsKinematics[VariablesName[4]], ValueRangeKinematics[VariablesName[4]].first, ValueRangeKinematics[VariablesName[4]].second, NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[5]].first, ValueRangeKinematics[VariablesName[5]].second);
-    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BMULT")] -> Sumw2();
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[5].first.Data(), AxisName[6].first.Data()), 5*NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[5]].first, ValueRangeKinematics[VariablesName[5]].second, 5*NumberOfBinsKinematics[VariablesName[6]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[6]].second);
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BMULT")]->Sumw2();
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "EMULT")] = new TH2D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), "EMULT"), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "EMULT", AxisName[6].first.Data(), AxisName[4].first.Data()), 5*NumberOfBinsKinematics[VariablesName[6]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[6]].second, 5*NumberOfBinsKinematics[VariablesName[4]], 100*ValueRangeKinematics[VariablesName[4]].first, 100*ValueRangeKinematics[VariablesName[4]].second);
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "EMULT")]->Sumw2();
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BE")] = new TH2D(Form("hKinematic%s%s", FlowCentralityName[iCentrality].Data(), "BE"), Form("hKinematic%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BE", AxisName[5].first.Data(), AxisName[4].first.Data()), 5*NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[5]].first, ValueRangeKinematics[VariablesName[5]].second, 5*NumberOfBinsKinematics[VariablesName[4]], 100*ValueRangeKinematics[VariablesName[4]].first, 100*ValueRangeKinematics[VariablesName[4]].second);
+    kinematicHists2D[TString("hKinematics" + FlowCentralityName[iCentrality] + "BE")]->Sumw2();
     fHistogramKinematics.push_back(kinematicHists);
     fHistogramKinematics2D.push_back(kinematicHists2D);
     std::cout << "\n"
@@ -141,8 +184,8 @@ void DataReaderPlotter::InitCuts()
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])] = new TH1D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data()), Form("hCuts%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data(), AxisName[iVariables].first.Data(), AxisName[iVariables].second.Data()), NumberOfBinsCuts[VariablesName[iVariables]], ValueRangeCuts[VariablesName[iVariables]].first, ValueRangeCuts[VariablesName[iVariables]].second);
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
-    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hCut%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[4].first.Data(), AxisName[5].first.Data()), NumberOfBinsKinematics[VariablesName[4]], ValueRangeKinematics[VariablesName[4]].first, ValueRangeKinematics[VariablesName[4]].second, NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[5]].first, ValueRangeKinematics[VariablesName[5]].second);
-    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] -> Sumw2();
+    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hCut%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[5].first.Data(), AxisName[6].first.Data()), NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[5]].second, NumberOfBinsKinematics[VariablesName[6]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[6]].second);
+    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")]->Sumw2();
     fHistogramCuts.push_back(cutsHists);
     fHistogramCuts2D.push_back(cutsHists2D);
     std::cout << "\n"
@@ -229,6 +272,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
           phi = TMath::ATan2(_event->Py[iParticle], _event->Px[iParticle]);
 
           fHistogramYild[TString("hYildPt" + ParticleName[iPID])]->Fill(Pt, _weight);
+          fHistogramYild[TString("hYildE" + ParticleName[iPID])]->Fill(_event->E[iParticle], _weight);
           fHistogramYild[TString("hYildEta" + ParticleName[iPID])]->Fill(Eta, _weight);
           fHistogramYild[TString("hYildRapidity" + ParticleName[iPID])]->Fill(Rapidity, _weight);
           fHistogramYild[TString("hYildPhi" + ParticleName[iPID])]->Fill(phi, _weight);
@@ -239,6 +283,8 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
 
   if (isKinematicsInitialized)
   {
+    Int_t multiplicity_midrap;
+    Double_t energy_forward;
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
       if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
@@ -246,7 +292,12 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "Npart"]->Fill(_event->Nparticles, _weight);
-        fHistogramKinematics2D.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "BMULT"]->Fill(_event->B, _event->Nparticles, _weight);
+        multiplicity_midrap = GetMultiplicity(_event, 1.);
+        energy_forward = GetEnergy(_event, 2.5);
+        // std::cout << "\tNpart_eta_range: " << multiplicity_midrap << "\tEnergy_eta_range: " << energy_forward << std::endl;
+        fHistogramKinematics2D.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "BMULT"]->Fill(_event->B, multiplicity_midrap, _weight);
+        fHistogramKinematics2D.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "EMULT"]->Fill(multiplicity_midrap, energy_forward, _weight);
+        fHistogramKinematics2D.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "BE"]->Fill(_event->B, energy_forward, _weight);
         for (Int_t iParticle = 0; iParticle < _event->Nparticles; iParticle++)
         {
           for (Int_t iPID = 0; iPID < NumberOfParticles; iPID++)
@@ -260,6 +311,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
               phi = TMath::ATan2(_event->Py[iParticle], _event->Px[iParticle]);
 
               fHistogramKinematics.at(iCentrality)[TString("hKinematics" + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, _weight);
+              fHistogramKinematics.at(iCentrality)[TString("hKinematics" + FlowCentralityName[iCentrality] + "E" + ParticleName[iPID])]->Fill(_event->E[iParticle], _weight);
               fHistogramKinematics.at(iCentrality)[TString("hKinematics" + FlowCentralityName[iCentrality] + "Eta" + ParticleName[iPID])]->Fill(Eta, _weight);
               fHistogramKinematics.at(iCentrality)[TString("hKinematics" + FlowCentralityName[iCentrality] + "Rapidity" + ParticleName[iPID])]->Fill(Rapidity, _weight);
               fHistogramKinematics.at(iCentrality)[TString("hKinematics" + FlowCentralityName[iCentrality] + "Phi" + ParticleName[iPID])]->Fill(phi, _weight);
@@ -295,6 +347,7 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
               if (Pt > FlowPtcut.first && Pt < FlowPtcut.second && Eta > FlowEtacut.first && Eta < FlowEtacut.second)
               {
                 fHistogramCuts.at(iCentrality)[TString("hCuts" + FlowCentralityName[iCentrality] + "Pt" + ParticleName[iPID])]->Fill(Pt, _weight);
+                fHistogramCuts.at(iCentrality)[TString("hCuts" + FlowCentralityName[iCentrality] + "E" + ParticleName[iPID])]->Fill(_event->E[iParticle], _weight);
                 fHistogramCuts.at(iCentrality)[TString("hCuts" + FlowCentralityName[iCentrality] + "Eta" + ParticleName[iPID])]->Fill(Eta, _weight);
                 fHistogramCuts.at(iCentrality)[TString("hCuts" + FlowCentralityName[iCentrality] + "Rapidity" + ParticleName[iPID])]->Fill(Rapidity, _weight);
                 fHistogramCuts.at(iCentrality)[TString("hCuts" + FlowCentralityName[iCentrality] + "Phi" + ParticleName[iPID])]->Fill(phi, _weight);

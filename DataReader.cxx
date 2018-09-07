@@ -185,7 +185,7 @@ void DataReader::ReadUNIGEN()
   TTree *tree;
   UEvent *uEvent = new UEvent();
   UParticle *uParticle;
-  int TimeStep = 4;
+  int TimeStep = 1;
   iFile.ROOT->cd();
   tree = (TTree *)iFile.ROOT->Get("events");
   // Timestep taken into account
