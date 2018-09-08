@@ -162,9 +162,10 @@ void DataReaderPlotter::InitCuts()
   ValueRangeCuts[VariablesName[1]] = {-5., 5.};                   //Eta
   ValueRangeCuts[VariablesName[2]] = {-5., 5.};                   //Rapidity
   ValueRangeCuts[VariablesName[3]] = {-TMath::Pi(), TMath::Pi()}; //Phi
-  ValueRangeCuts[VariablesName[4]] = {0., 17.};                   //B
-  ValueRangeCuts[VariablesName[5]] = {0., 2500.};                 //Npart
-  ValueRangeCuts[VariablesName[6]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP
+  ValueRangeCuts[VariablesName[4]] = {0., 15.};                 //Energy in forward rapidity region
+  ValueRangeCuts[VariablesName[5]] = {0., 17.};                   //B
+  ValueRangeCuts[VariablesName[6]] = {0., 2500.};                 //Npart
+  ValueRangeCuts[VariablesName[7]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP
 
   for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
   {
@@ -184,7 +185,7 @@ void DataReaderPlotter::InitCuts()
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])] = new TH1D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data()), Form("hCuts%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), VariablesName[iVariables].Data(), AxisName[iVariables].first.Data(), AxisName[iVariables].second.Data()), NumberOfBinsCuts[VariablesName[iVariables]], ValueRangeCuts[VariablesName[iVariables]].first, ValueRangeCuts[VariablesName[iVariables]].second);
       cutsHists[TString("hCuts" + FlowCentralityName[iCentrality] + VariablesName[iVariables])]->Sumw2();
     }
-    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hCut%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[5].first.Data(), AxisName[6].first.Data()), NumberOfBinsKinematics[VariablesName[5]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[5]].second, NumberOfBinsKinematics[VariablesName[6]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[6]].second);
+    cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")] = new TH2D(Form("hCuts%s%s", FlowCentralityName[iCentrality].Data(), "BMULT"), Form("hCut%s%s;%s;%s", FlowCentralityName[iCentrality].Data(), "BMULT", AxisName[6].first.Data(), AxisName[7].first.Data()), NumberOfBinsKinematics[VariablesName[6]], ValueRangeKinematics[VariablesName[6]].first, ValueRangeKinematics[VariablesName[6]].second, NumberOfBinsKinematics[VariablesName[7]], ValueRangeKinematics[VariablesName[7]].first, ValueRangeKinematics[VariablesName[7]].second);
     cutsHists2D[TString("hCuts" + FlowCentralityName[iCentrality] + "BMULT")]->Sumw2();
     fHistogramCuts.push_back(cutsHists);
     fHistogramCuts2D.push_back(cutsHists2D);
