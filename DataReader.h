@@ -44,6 +44,7 @@ struct ModelType
   Bool_t isLAQGSM;
   Bool_t isPHSD;
   Bool_t isPHQMD;
+  Bool_t isDCMQGSM;
   ClassDef(ModelType, 0);
 };
 

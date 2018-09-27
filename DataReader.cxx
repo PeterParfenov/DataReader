@@ -42,6 +42,10 @@ Bool_t DataReader::InitInputFile(TString _name)
     {
       fModelType.isPHQMD = true;
     }
+    if (_name.Contains("dcmqgsm") || _name.Contains("DCMQGSM"))
+    {
+      fModelType.isDCMQGSM = true;
+    }
   }
 
   if (fModelType.isURQMD)
@@ -59,6 +63,10 @@ Bool_t DataReader::InitInputFile(TString _name)
   if (fModelType.isPHQMD)
   {
     std::cout << "DataReader::InitInputFile: Input model type: PHQMD" << std::endl;
+  }
+  if (fModelType.isDCMQGSM)
+  {
+    std::cout << "DataReader::InitInputFile: Input model type: DCMQGSM" << std::endl;
   }
   Bool_t result = OpenInputFile(_name);
   return result;
@@ -98,6 +106,8 @@ Bool_t DataReader::ReadFile(TString _name)
     ReadLAQGSM();
   if (fFileType.isASCII && fModelType.isPHSD)
     ReadPHSD();
+  if (fFileType.isROOT && fModelType.isDCMQGSM)
+    ReadUNIGEN();
 
   return true;
 }
@@ -217,7 +227,7 @@ void DataReader::ReadUNIGEN()
       lEvent->Py[iTrack] = uParticle->Py();
       lEvent->Pz[iTrack] = uParticle->Pz();
       lEvent->PID[iTrack] = uParticle->GetPdg();
-      if (lEvent->PID[iTrack] == 2212) lEvent->Pz[iTrack] *= -1;
+      if (fModelType.isPHQMD && lEvent->PID[iTrack] == 2212) lEvent->Pz[iTrack] *= -1;
       lEvent->M[iTrack] = TMath::Sqrt(lEvent->E[iTrack] * lEvent->E[iTrack] - lEvent->Px[iTrack] * lEvent->Px[iTrack] - lEvent->Py[iTrack] * lEvent->Py[iTrack] - lEvent->Pz[iTrack] * lEvent->Pz[iTrack]);
     }
 
@@ -336,11 +346,11 @@ void DataReader::ReadPHSD()
     ss.clear();
     ss << str;
     ss >> fNP;
-    if (fIBw == 0)
-    {
-      std::cerr << "DataReader::ReadGZPHSD: Proper weight has to be accounted!" << std::endl;
-      return;
-    }
+    //if (fIBw == 0)
+    //{
+    //  std::cerr << "DataReader::ReadGZPHSD: Proper weight has to be accounted!" << std::endl;
+    //  return;
+    //}
     fCount++;
     lEvent->Nevent = fCount;
     lEvent->B = fBimp;
