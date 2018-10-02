@@ -214,11 +214,13 @@ void DataReader::ReadUNIGEN()
     lEvent->Nevent = uEvent->GetEventNr();
     lEvent->Nparticles = uEvent->GetNpa();
     lEvent->Time = uEvent->GetStepT();
+    lEvent->PsiRP = uEvent->GetPhi();
 
     std::cout << "DataReader::ReadPHQMD: Event " << lEvent->Nevent
               << "\n\tImpact parameter: " << lEvent->B << " fm."
               << "\n\tNparticles: " << lEvent->Nparticles
               << "\n\tTime: " << lEvent->Time << std::endl;
+    if (fModelType.isDCMQGSM) std::cout << "\tPsiRP: " << lEvent->PsiRP << std::endl;
     for (Int_t iTrack = 0; iTrack < lEvent->Nparticles; iTrack++)
     {
       uParticle = uEvent->GetParticle(iTrack);

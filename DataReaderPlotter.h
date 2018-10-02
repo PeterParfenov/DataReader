@@ -73,17 +73,18 @@ const Double_t FlowMidRapidityCutForPt = 0.1;
 const Int_t FlowNumberOfHarmonic = 3;
 
 // Number of bins for custom binning (Flow)
-const Int_t FlowNPtBins = 25;
+// const Int_t FlowNPtBins = 25;
+const Int_t FlowNPtBins = 12;
 const Int_t FlowNEtaBins = 15;
 const Int_t FlowNRapidityBins = 10;
 const Int_t FlowNBBins = 12;
 
 // Custom bin arrays (Flow)
-//const Double_t FlowPtBinning[] = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.};
+const Double_t FlowPtBinning[] = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1., 1.2, 1.4, 1.6, 1.8, 2.};
 const Double_t FlowEtaBinning[] = {-1.5, -1.3, -1.1, -0.9, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5};
 const Double_t FlowRapidityBinning[] = {-1., -0.8, -0.6, -0.4, -0.2, 0., 0.2, 0.4, 0.6, 0.8, 1.};
 const Double_t FlowBBinning[] = {0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12};
-const Double_t FlowPtBinning[] = {0,0.08,0.16,0.24,0.32,0.4,0.48,0.56,0.64,0.72,0.8,0.88,0.96,1.04,1.12,1.2,1.28,1.36,1.44,1.52,1.6,1.68,1.76,1.84,1.92,2.};
+//const Double_t FlowPtBinning[] = {0,0.08,0.16,0.24,0.32,0.4,0.48,0.56,0.64,0.72,0.8,0.88,0.96,1.04,1.12,1.2,1.28,1.36,1.44,1.52,1.6,1.68,1.76,1.84,1.92,2.};
 } // namespace dataplotter
 
 using namespace dataplotter;
