@@ -13,6 +13,12 @@ DataReader::~DataReader()
     oHistFile->Close();
 }
 
+void DataReader::InitCentralityMethod()
+{
+  std::cout << "DataReader::InitCentralityMethod: centrality is calculated via the formula: 100*B^2/(2*R)^2" << std::endl;
+  isCentralityMethod = true;
+}
+
 Bool_t DataReader::InitInputFile(TString _name)
 {
   std::cout << "DataReader::InitInputFile: Processing." << std::endl;
@@ -161,7 +167,8 @@ void DataReader::ReadUrQMD()
       ss.clear();
       ss << str;
       ss >> lEvent->Nparticles >> lEvent->Time;
-      std::cout << "DataReader::ReadUrQMD: Event " << lEvent->Nevent
+      if (lEvent->Nevent % 1000 == 0)
+        std::cout << "DataReader::ReadUrQMD: Event " << lEvent->Nevent
                 << "\n\tImpact parameter: " << lEvent->B << " fm."
                 << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
       str = GetLine();
@@ -215,12 +222,12 @@ void DataReader::ReadUNIGEN()
     lEvent->Nparticles = uEvent->GetNpa();
     lEvent->Time = uEvent->GetStepT();
     lEvent->PsiRP = uEvent->GetPhi();
-
-    std::cout << "DataReader::ReadPHQMD: Event " << lEvent->Nevent
+    if (lEvent->Nevent % 1000 == 0)
+      std::cout << "DataReader::ReadPHQMD: Event " << lEvent->Nevent
               << "\n\tImpact parameter: " << lEvent->B << " fm."
               << "\n\tNparticles: " << lEvent->Nparticles
               << "\n\tTime: " << lEvent->Time << std::endl;
-    if (fModelType.isDCMQGSM) std::cout << "\tPsiRP: " << lEvent->PsiRP << std::endl;
+    if (fModelType.isDCMQGSM && (lEvent->Nevent % 1000 == 0)) std::cout << "\tPsiRP: " << lEvent->PsiRP << std::endl;
     for (Int_t iTrack = 0; iTrack < lEvent->Nparticles; iTrack++)
     {
       uParticle = uEvent->GetParticle(iTrack);
@@ -278,7 +285,8 @@ void DataReader::ReadLAQGSM()
     ss << str;
     ss >> lEvent->Nevent >> lEvent->Nparticles >> lEvent->B >> bx >> by;
     lEvent->PsiRP = TMath::ATan2(by, bx);
-    std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
+    if (lEvent->Nevent % 1000 == 0)
+      std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
               << "\n\tImpact parameter: " << lEvent->B << " fm."
               << "\n\tNparticles: " << lEvent->Nparticles
               << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
@@ -357,7 +365,8 @@ void DataReader::ReadPHSD()
     lEvent->Nevent = fCount;
     lEvent->B = fBimp;
     lEvent->Nparticles = fNTr;
-    std::cout << "DataReader::ReadGZPHSD: Event " << lEvent->Nevent
+    if (lEvent->Nevent % 1000 == 0)
+      std::cout << "DataReader::ReadGZPHSD: Event " << lEvent->Nevent
               << "\n\tiSub = " << fISub << " iRun = " << fIRun
               << "\n\tImpact parameter: " << lEvent->B << " fm."
               << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
@@ -494,6 +503,7 @@ void DataReader::InitPlotter()
   fPlotter->InitKinematics();
   fPlotter->InitCuts();
   fPlotter->InitFlow();
+  if (isCentralityMethod) fPlotter->DetermineCentrality();
 }
 
 Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange)

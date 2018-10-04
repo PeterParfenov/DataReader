@@ -63,6 +63,7 @@ public:
   void ScaleYildHists(Double_t _NumberOfFiles);
   void WriteTree();
   void WriteHist();
+  void InitCentralityMethod();
 
 private:
   void FillTree();
@@ -92,6 +93,7 @@ protected:
   Bool_t isDRETreeInitialized = false;
   Bool_t isOutputTreeFileInitialized = false;
   Bool_t isOutputHistFileInitialized = false;
+  Bool_t isCentralityMethod = false;
 
   ClassDef(DataReader, 0);
 };

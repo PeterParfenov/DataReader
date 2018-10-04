@@ -13,9 +13,10 @@ int main(int argc, char **argv)
   Double_t Norm = 1.;
   Bool_t isTree = false;
   Bool_t isHist = false;
+  Bool_t isCentralityMethod = false;
   if (argc < 5)
   {
-    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [--tree or --hist] [OPTIONAL: -Nfiles NFILES]" << std::endl;
+    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [--tree or --hist] [OPTIONAL: -Nfiles NFILES, --centrality-method]" << std::endl;
     return 10;
   }
 
@@ -25,6 +26,7 @@ int main(int argc, char **argv)
         std::string(argv[i]) != "-o" &&
         std::string(argv[i]) != "-Nfiles" &&
         std::string(argv[i]) != "--tree" &&
+        std::string(argv[i]) != "--centrality-method" &&
         std::string(argv[i]) != "--hist")
     {
       std::cerr << "\nDataReaderMain: Unknown parameter: " << i << ": " << argv[i] << std::endl;
@@ -67,6 +69,10 @@ int main(int argc, char **argv)
       {
         isHist = true;
       }
+      if (std::string(argv[i]) == "--centrality-method")
+      {
+        isCentralityMethod = true;
+      }
     }
   }
 
@@ -80,6 +86,7 @@ int main(int argc, char **argv)
   // dR->InitDRETree("DRETree", "Basic QA tree w/ DataReaderEvent class");
   if (isTree) dR->InitOutputTreeFile(outFileName);
   if (isHist) dR->InitOutputHistFile(outFileName);
+  if (isCentralityMethod) dR->InitCentralityMethod();
   dR->ReadFile(inFileName);
   dR->ScaleYildHists(Norm);
   if (isTree) dR->WriteTree();

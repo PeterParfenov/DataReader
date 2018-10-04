@@ -61,6 +61,9 @@ const TString FlowCentralityName[] = {TString("All"), TString("Central"), TStrin
 const std::pair<Double_t, Double_t> FlowBRegion[] = {{0., 17.}, {0., 5.}, {5., 9.}, {9., 15.}};
 // Total number of impact parameter sets for the selection (for Kinematics, Cuts, Flow)
 const Int_t NumberOfBRegions = 4;
+// Centrality range (for Kinematics, Cuts, Flow)
+const std::pair<Double_t, Double_t> FlowCentralityRegion[] = {{0.,100.},{0.,10.},{10.,40.},{40.,80.}};
+const Int_t NumberOfCentralityRegions = NumberOfBRegions;
 
 // Sets of cuts for track selection (for Kinematics, Cuts, Flow)
 const std::pair<Double_t, Double_t> FlowEtacut = {-1.0, 1.0};
@@ -103,6 +106,7 @@ public:
   void InitKinematics();
   void InitCuts();
   void InitFlow();
+  void DetermineCentrality();
 
 private:
   std::map<TString, TH1D *> fHistogramYild;
@@ -126,6 +130,7 @@ private:
   Bool_t isKinematicsInitialized;
   Bool_t isCutsInitialized;
   Bool_t isFlowInitialized;
+  Bool_t isCentralityDetermined;
 };
 
 #endif

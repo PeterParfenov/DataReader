@@ -20,6 +20,12 @@ Int_t GetMultiplicity(DataReaderEvent *_event, Double_t _eta)
   return mult;
 }
 
+Double_t GetCentrality(Double_t _b)
+{
+  Double_t rAu = 6.98;
+  return (100.*TMath::Power(_b,2)/TMath::Power(2*rAu,2));
+}
+
 Double_t GetEnergy(DataReaderEvent *_event, Double_t _eta)
 {
   Double_t energy = 0.;
@@ -44,7 +50,14 @@ DataReaderPlotter::DataReaderPlotter()
   isKinematicsInitialized = false;
   isCutsInitialized = false;
   isFlowInitialized = false;
+  isCentralityDetermined = false;
 }
+
+void DataReaderPlotter::DetermineCentrality()
+{
+  isCentralityDetermined = true;
+}
+
 DataReaderPlotter::~DataReaderPlotter()
 {
 }
@@ -254,6 +267,7 @@ void DataReaderPlotter::InitFlow()
 void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
 {
   Double_t Rapidity, Pt, Eta, P, phi;
+  Bool_t isB = false, isCentrality = false;
 
   if (isYildInitialized && _event->B <= BcutInYild.second && _event->B >= BcutInYild.first)
   {
@@ -288,7 +302,9 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
     Double_t energy_forward;
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
-      if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
+      if (!isCentralityDetermined && (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) isB = true;
+      if (isCentralityDetermined && (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) isCentrality = true;
+      if (isB || isCentrality)
       {
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
@@ -327,7 +343,11 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
   {
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
-      if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
+      if (
+        (isCentralityDetermined && 
+          (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) ||
+        (!isCentralityDetermined && 
+          (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) )
       {
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
@@ -366,7 +386,11 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
     Double_t v1, v2;
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
-      if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
+      if (
+        (isCentralityDetermined && 
+          (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) ||
+        (!isCentralityDetermined && 
+          (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) )
       {
         for (Int_t iParticle = 0; iParticle < _event->Nparticles; iParticle++)
         {

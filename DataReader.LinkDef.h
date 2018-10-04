@@ -13,5 +13,6 @@
 #pragma link C++ struct InputFile+;
 #pragma link C++ function GetMultiplicity;
 #pragma link C++ function GetEnergy;
+#pragma link C++ function GetCentrality;
 
 #endif
