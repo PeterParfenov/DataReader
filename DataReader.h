@@ -70,6 +70,7 @@ private:
   void ReadUrQMD();
   void ReadUNIGEN();
   void ReadLAQGSM();
+  void ReadLAQGSM_type2();
   void ReadPHSD();
   Bool_t eof();
   std::string GetLine();

@@ -109,7 +109,7 @@ Bool_t DataReader::ReadFile(TString _name)
   if (fFileType.isROOT && fModelType.isPHQMD)
     ReadUNIGEN();
   if (fFileType.isASCII && fModelType.isLAQGSM)
-    ReadLAQGSM();
+    ReadLAQGSM_type2();// ReadLAQGSM();
   if (fFileType.isASCII && fModelType.isPHSD)
     ReadPHSD();
   if (fFileType.isROOT && fModelType.isDCMQGSM)
@@ -169,8 +169,8 @@ void DataReader::ReadUrQMD()
       ss >> lEvent->Nparticles >> lEvent->Time;
       if (lEvent->Nevent % 1000 == 0)
         std::cout << "DataReader::ReadUrQMD: Event " << lEvent->Nevent
-                << "\n\tImpact parameter: " << lEvent->B << " fm."
-                << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
+                  << "\n\tImpact parameter: " << lEvent->B << " fm."
+                  << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
       str = GetLine();
       // Loop on particles on all time in this event
       Int_t i3, lcl, ncl, orr, itype;
@@ -224,10 +224,11 @@ void DataReader::ReadUNIGEN()
     lEvent->PsiRP = uEvent->GetPhi();
     if (lEvent->Nevent % 1000 == 0)
       std::cout << "DataReader::ReadPHQMD: Event " << lEvent->Nevent
-              << "\n\tImpact parameter: " << lEvent->B << " fm."
-              << "\n\tNparticles: " << lEvent->Nparticles
-              << "\n\tTime: " << lEvent->Time << std::endl;
-    if (fModelType.isDCMQGSM && (lEvent->Nevent % 1000 == 0)) std::cout << "\tPsiRP: " << lEvent->PsiRP << std::endl;
+                << "\n\tImpact parameter: " << lEvent->B << " fm."
+                << "\n\tNparticles: " << lEvent->Nparticles
+                << "\n\tTime: " << lEvent->Time << std::endl;
+    if (fModelType.isDCMQGSM && (lEvent->Nevent % 1000 == 0))
+      std::cout << "\tPsiRP: " << lEvent->PsiRP << std::endl;
     for (Int_t iTrack = 0; iTrack < lEvent->Nparticles; iTrack++)
     {
       uParticle = uEvent->GetParticle(iTrack);
@@ -236,7 +237,8 @@ void DataReader::ReadUNIGEN()
       lEvent->Py[iTrack] = uParticle->Py();
       lEvent->Pz[iTrack] = uParticle->Pz();
       lEvent->PID[iTrack] = uParticle->GetPdg();
-      if (fModelType.isPHQMD && lEvent->PID[iTrack] == 2212) lEvent->Pz[iTrack] *= -1;
+      if (fModelType.isPHQMD && lEvent->PID[iTrack] == 2212)
+        lEvent->Pz[iTrack] *= -1;
       lEvent->M[iTrack] = TMath::Sqrt(lEvent->E[iTrack] * lEvent->E[iTrack] - lEvent->Px[iTrack] * lEvent->Px[iTrack] - lEvent->Py[iTrack] * lEvent->Py[iTrack] - lEvent->Pz[iTrack] * lEvent->Pz[iTrack]);
     }
 
@@ -287,9 +289,9 @@ void DataReader::ReadLAQGSM()
     lEvent->PsiRP = TMath::ATan2(by, bx);
     if (lEvent->Nevent % 1000 == 0)
       std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
-              << "\n\tImpact parameter: " << lEvent->B << " fm."
-              << "\n\tNparticles: " << lEvent->Nparticles
-              << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
+                << "\n\tImpact parameter: " << lEvent->B << " fm."
+                << "\n\tNparticles: " << lEvent->Nparticles
+                << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
 
     // Loop on particles on all time in this event
     Int_t iLeptonic = 0, iStrange = 0, iBaryonic = 0, iCode = 0, iCode1 = 0, iCode2 = 0;
@@ -303,6 +305,80 @@ void DataReader::ReadLAQGSM()
       if (fQGSM_format_ID < 3)
       {
         ss >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> str >> lEvent->M[j];
+      }
+      // std::cout << lEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << lEvent->Px[j] << " " << lEvent->Py[j] << " " << lEvent->Pz[j] << " " << str << lEvent->M[j] << std::endl;
+      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
+      lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
+    }
+    fPlotter->Fill(lEvent, 1.);
+    fEvent = lEvent;
+    FillTree();
+    delete lEvent;
+    if (iFile.ASCII.eof())
+    {
+      break;
+    }
+  }
+}
+
+void DataReader::ReadLAQGSM_type2()
+{
+  std::cout << "DataReader::ReadLAQGSM: Processing." << std::endl;
+  std::string str;
+  std::stringstream ss;
+
+  const int skipLinesHeader = 2;
+  const int skipLinesEvent = 8;
+
+  Double_t bx = 0., by = 0.;
+
+  Int_t fQGSM_format_ID = 2;
+  str = GetLine();
+  // Skip lines
+  for (Int_t j = 0; j < skipLinesEvent - 1; j++)
+  {
+    str = GetLine();
+  }
+
+  while (!eof())
+  {
+    double rr;
+    DataReaderEvent *lEvent = new DataReaderEvent();
+    // fEvent->CleanEvent();
+    // Read impact parameter
+    ss.str("");
+    ss.clear();
+    str = GetLine();
+    if (str.empty())
+    {
+      std::cerr << "DataReader::ReadLAQGSM: [WARNING] line is empty. Skipping." << std::endl;
+      break;
+    }
+    ss << str;
+    ss >> lEvent->Nevent >> rr >> lEvent->Nparticles >> lEvent->B >> bx >> by;
+    lEvent->PsiRP = TMath::ATan2(by, bx);
+    if (lEvent->Nevent % 1000 == 0)
+      std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
+                << "\n\tImpact parameter: " << lEvent->B << " fm."
+                << "\n\tNparticles: " << lEvent->Nparticles
+                << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
+
+    // Loop on particles on all time in this event
+    Int_t iLeptonic = 0, iStrange = 0, iBaryonic = 0, iCode = 0, iCode1 = 0, iCode2 = 0;
+    Double_t pza = 0., pzb = 0;
+    for (Int_t j = 0; j < skipLinesHeader; j++)
+    {
+      str = GetLine();
+    }
+    for (Int_t j = 0; j < lEvent->Nparticles; j++)
+    {
+      ss.str("");
+      ss.clear();
+      str = GetLine();
+      ss << str;
+      if (fQGSM_format_ID < 3)
+      {
+        ss >> iCode >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j];
       }
       // std::cout << lEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << lEvent->Px[j] << " " << lEvent->Py[j] << " " << lEvent->Pz[j] << " " << str << lEvent->M[j] << std::endl;
       lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
@@ -367,9 +443,9 @@ void DataReader::ReadPHSD()
     lEvent->Nparticles = fNTr;
     if (lEvent->Nevent % 1000 == 0)
       std::cout << "DataReader::ReadGZPHSD: Event " << lEvent->Nevent
-              << "\n\tiSub = " << fISub << " iRun = " << fIRun
-              << "\n\tImpact parameter: " << lEvent->B << " fm."
-              << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
+                << "\n\tiSub = " << fISub << " iRun = " << fIRun
+                << "\n\tImpact parameter: " << lEvent->B << " fm."
+                << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
     // << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
 
     for (Int_t j = 0; j < lEvent->Nparticles; j++)
@@ -503,7 +579,8 @@ void DataReader::InitPlotter()
   fPlotter->InitKinematics();
   fPlotter->InitCuts();
   fPlotter->InitFlow();
-  if (isCentralityMethod) fPlotter->DetermineCentrality();
+  if (isCentralityMethod)
+    fPlotter->DetermineCentrality();
 }
 
 Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange)

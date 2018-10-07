@@ -343,11 +343,9 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
   {
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
-      if (
-        (isCentralityDetermined && 
-          (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) ||
-        (!isCentralityDetermined && 
-          (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) )
+      if (!isCentralityDetermined && (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) isB = true;
+      if (isCentralityDetermined && (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) isCentrality = true;
+      if (isB || isCentrality)
       {
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
@@ -386,11 +384,9 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
     Double_t v1, v2;
     for (Int_t iCentrality = 0; iCentrality < NumberOfBRegions; iCentrality++)
     {
-      if (
-        (isCentralityDetermined && 
-          (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) ||
-        (!isCentralityDetermined && 
-          (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) )
+      if (!isCentralityDetermined && (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) isB = true;
+      if (isCentralityDetermined && (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) isCentrality = true;
+      if (isB || isCentrality)
       {
         for (Int_t iParticle = 0; iParticle < _event->Nparticles; iParticle++)
         {
