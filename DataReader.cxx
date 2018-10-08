@@ -243,7 +243,8 @@ void DataReader::ReadUNIGEN()
     }
 
     // Reweightning impact parameter
-    fPlotter->Fill(lEvent, 2 * TMath::Pi() * lEvent->B * 0.025);
+    // if (fModelType.isPHQMD) fPlotter->Fill(lEvent, 2 * TMath::Pi() * lEvent->B * 0.025);
+    /*if (fModelType.isDCMQGSM)*/ fPlotter->Fill(lEvent, 1.);
     fEvent = lEvent;
     FillTree();
     delete lEvent;
@@ -357,7 +358,7 @@ void DataReader::ReadLAQGSM_type2()
     ss << str;
     ss >> lEvent->Nevent >> rr >> lEvent->Nparticles >> lEvent->B >> bx >> by;
     lEvent->PsiRP = TMath::ATan2(by, bx);
-    if (lEvent->Nevent % 1000 == 0)
+    // if (lEvent->Nevent % 1000 == 0)
       std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
                 << "\n\tImpact parameter: " << lEvent->B << " fm."
                 << "\n\tNparticles: " << lEvent->Nparticles
@@ -381,7 +382,7 @@ void DataReader::ReadLAQGSM_type2()
         ss >> iCode >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j];
       }
       // std::cout << lEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << lEvent->Px[j] << " " << lEvent->Py[j] << " " << lEvent->Pz[j] << " " << str << lEvent->M[j] << std::endl;
-      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
+      //lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
       lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
     }
     fPlotter->Fill(lEvent, 1.);
