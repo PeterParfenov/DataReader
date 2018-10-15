@@ -304,7 +304,8 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
     {
       if (!isCentralityDetermined && (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) isB = true;
       if (isCentralityDetermined && (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) isCentrality = true;
-      if (isB || isCentrality)
+      // if (isB || isCentrality)
+      if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
       {
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramKinematics.at(iCentrality)["hKinematics" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
@@ -345,7 +346,8 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
     {
       if (!isCentralityDetermined && (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) isB = true;
       if (isCentralityDetermined && (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) isCentrality = true;
-      if (isB || isCentrality)
+      //if (isB || isCentrality)
+      if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
       {
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "B"]->Fill(_event->B, _weight);
         fHistogramCuts.at(iCentrality)["hCuts" + FlowCentralityName[iCentrality] + "PsiRP"]->Fill(_event->PsiRP, _weight);
@@ -386,7 +388,8 @@ void DataReaderPlotter::Fill(DataReaderEvent *_event, Double_t _weight = 1.)
     {
       if (!isCentralityDetermined && (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)) isB = true;
       if (isCentralityDetermined && (GetCentrality(_event->B) >= FlowCentralityRegion[iCentrality].first && GetCentrality(_event->B) < FlowCentralityRegion[iCentrality].second)) isCentrality = true;
-      if (isB || isCentrality)
+      //if (isB || isCentrality)
+      if (_event->B >= FlowBRegion[iCentrality].first && _event->B < FlowBRegion[iCentrality].second)
       {
         for (Int_t iParticle = 0; iParticle < _event->Nparticles; iParticle++)
         {

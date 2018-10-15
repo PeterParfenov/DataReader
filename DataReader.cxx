@@ -109,7 +109,8 @@ Bool_t DataReader::ReadFile(TString _name)
   if (fFileType.isROOT && fModelType.isPHQMD)
     ReadUNIGEN();
   if (fFileType.isASCII && fModelType.isLAQGSM)
-    ReadLAQGSM_type2();// ReadLAQGSM();
+    ReadLAQGSM_type2();
+    // ReadLAQGSM();
   if (fFileType.isASCII && fModelType.isPHSD)
     ReadPHSD();
   if (fFileType.isROOT && fModelType.isDCMQGSM)
@@ -293,6 +294,7 @@ void DataReader::ReadLAQGSM()
                 << "\n\tImpact parameter: " << lEvent->B << " fm."
                 << "\n\tNparticles: " << lEvent->Nparticles
                 << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
+    // if (lEvent->Nevent > 0) break;
 
     // Loop on particles on all time in this event
     Int_t iLeptonic = 0, iStrange = 0, iBaryonic = 0, iCode = 0, iCode1 = 0, iCode2 = 0;
@@ -307,9 +309,10 @@ void DataReader::ReadLAQGSM()
       {
         ss >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> str >> lEvent->M[j];
       }
-      // std::cout << lEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << lEvent->Px[j] << " " << lEvent->Py[j] << " " << lEvent->Pz[j] << " " << str << lEvent->M[j] << std::endl;
-      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
+      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange, lEvent->Charge[j], lEvent->M[j]);
       lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
+
+      // printf("%+3i %+3i %+3i %+3i %+5i %+5i %+3i %+3.2f %+3.2f %+3.2f %3.2f    %+6i\n",lEvent->Charge[j], iLeptonic, iStrange, iBaryonic, iCode, iCode1, iCode2, lEvent->Px[j], lEvent->Py[j], lEvent->Pz[j], lEvent->M[j], lEvent->PID[j]);
     }
     fPlotter->Fill(lEvent, 1.);
     fEvent = lEvent;
@@ -333,7 +336,7 @@ void DataReader::ReadLAQGSM_type2()
 
   Double_t bx = 0., by = 0.;
 
-  Int_t fQGSM_format_ID = 2;
+  // Int_t fQGSM_format_ID = 2;
   str = GetLine();
   // Skip lines
   for (Int_t j = 0; j < skipLinesEvent - 1; j++)
@@ -363,6 +366,7 @@ void DataReader::ReadLAQGSM_type2()
                 << "\n\tImpact parameter: " << lEvent->B << " fm."
                 << "\n\tNparticles: " << lEvent->Nparticles
                 << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
+    // if (lEvent->Nevent > 5) break;
 
     // Loop on particles on all time in this event
     Int_t iLeptonic = 0, iStrange = 0, iBaryonic = 0, iCode = 0, iCode1 = 0, iCode2 = 0;
@@ -377,13 +381,13 @@ void DataReader::ReadLAQGSM_type2()
       ss.clear();
       str = GetLine();
       ss << str;
-      if (fQGSM_format_ID < 3)
-      {
+      // if (fQGSM_format_ID < 3)
+      // {
         ss >> iCode >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j];
-      }
-      // std::cout << lEvent->Charge[j] << " " << iLeptonic << " " << iStrange << " " << iBaryonic << " " << iCode << " " << iCode1 << " " << iCode2 << " " << lEvent->Px[j] << " " << lEvent->Py[j] << " " << lEvent->Pz[j] << " " << str << lEvent->M[j] << std::endl;
-      //lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange);
+      // }
+      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange, lEvent->Charge[j], lEvent->M[j]);
       lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
+      // printf("%+3i %+3i %+3i %+3i %+5i %+5i %+3i %+3.2f %+3.2f %+3.2f %3.2f    %+6i\n",lEvent->Charge[j], iLeptonic, iStrange, iBaryonic, iCode, iCode1, iCode2, lEvent->Px[j], lEvent->Py[j], lEvent->Pz[j], lEvent->M[j], lEvent->PID[j]);
     }
     fPlotter->Fill(lEvent, 1.);
     fEvent = lEvent;
@@ -584,20 +588,20 @@ void DataReader::InitPlotter()
     fPlotter->DetermineCentrality();
 }
 
-Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange)
+Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass)
 {
   Int_t
       PDG = -9999,
       n_mass;
 
-  if (fEvent->M[iTrack] < 6)
+  if (mass < 6)
   { // use table
 
     Int_t
         l_min = -1, // line number first
         l_max = -1; // line number last
 
-    n_mass = (Int_t)(fEvent->M[iTrack] / 0.1);
+    n_mass = (Int_t)(mass / 0.1);
 
     switch (n_mass)
     {
@@ -643,7 +647,7 @@ Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, I
       break;
 
     case 22:
-      if (!fEvent->Charge[iTrack])
+      if (!charge)
       {
         l_min = 67;
         l_max = 67;
@@ -723,7 +727,7 @@ Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, I
     {
       for (int i = l_min - 1; i < l_max; i++)
       {
-        if (fEvent->Charge[iTrack] != fLa_tab[i].Z)
+        if (charge != fLa_tab[i].Z)
           continue;
         if (_strange != fLa_tab[i].strange)
           continue;
@@ -731,9 +735,9 @@ Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, I
           continue;
         if (_baryonic != fLa_tab[i].A)
           continue;
-        if (fEvent->M[iTrack] < (fLa_tab[i].mass * 0.99))
+        if (mass < (fLa_tab[i].mass * 0.99))
           continue;
-        if (fEvent->M[iTrack] > (fLa_tab[i].mass * 1.01))
+        if (mass > (fLa_tab[i].mass * 1.01))
           continue;
         PDG = fLa_tab[i].pdg;
         // strncpy(name, fLa_tab[i].name, 10);
