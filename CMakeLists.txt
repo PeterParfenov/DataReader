@@ -14,30 +14,64 @@ find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net)
 include(${ROOT_USE_FILE})
 
 #---Link UniGen library
-set(UNIGEN_INCLUDE $ENV{UNIGEN}/base/include)
-set(UNIGEN_LIB $ENV{UNIGEN}/lib)
-set(UNIGEN libUniGen.so)
-link_directories(${UNIGEN_LIB})
+message("Checking UniGen:")
+if(DEFINED ENV{UNIGEN})
+  message("UniGen found: " $ENV{UNIGEN})
 
-include_directories(${CMAKE_SOURCE_DIR} ${ROOT_INCLUDE_DIRS} ${UNIGEN_INCLUDE})
+  set(UNIGEN_INCLUDE $ENV{UNIGEN}/base/include)
+  set(UNIGEN_LIB $ENV{UNIGEN}/lib)
+  set(UNIGEN libUniGen.so)
+  link_directories(${UNIGEN_LIB})
+
+else(DEFINED ENV{UNIGEN})
+  message("UniGen not found")
+endif(DEFINED ENV{UNIGEN})
+
+if(DEFINED ENV{UNIGEN})
+  set(INCLUDE_DIRECTORIES
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/Converters
+    ${CMAKE_SOURCE_DIR}/Event
+    ${CMAKE_SOURCE_DIR}/Plotter
+    ${ROOT_INCLUDE_DIRS}
+    ${UNIGEN_INCLUDE}
+  )
+else(DEFINED ENV{UNIGEN})
+  set(INCLUDE_DIRECTORIES
+    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/Converters
+    ${CMAKE_SOURCE_DIR}/Event
+    ${CMAKE_SOURCE_DIR}/Plotter
+    ${ROOT_INCLUDE_DIRS}
+  )
+endif(DEFINED ENV{UNIGEN})
+
+include_directories(${INCLUDE_DIRECTORIES}
+)
 add_definitions(${ROOT_CXX_FLAGS})
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_FLAGS "-O2")
 
+add_subdirectory(Event)
+add_subdirectory(Plotter)
+add_subdirectory(Converters)
+
 #---Generate dictionary for DataReader
 ROOT_GENERATE_DICTIONARY(G__DataReader
-DataReader.h
-DataReaderPlotter.h
-DataReaderEvent.h
+  DataReader.h
 LINKDEF DataReader.LinkDef.h)
 
 #---Create a shared library with geneated dictionary for DataReader class
-add_library(DataReader SHARED DataReader.cxx
-DataReaderEvent.cxx
-DataReaderPlotter.cxx
+add_library(DataReader SHARED
+  DataReader.cxx
 G__DataReader.cxx)
-target_link_libraries(DataReader ${UNIGEN} ${ROOT_LIBRARIES})
+
+if(DEFINED ENV{UNIGEN})
+  target_link_libraries(DataReader Plotter Converters ${UNIGEN} ${ROOT_LIBRARIES})
+else(DEFINED ENV{UNIGEN})
+  target_link_libraries(DataReader Plotter Converters ${ROOT_LIBRARIES})
+endif(DEFINED ENV{UNIGEN})
 
 #---Create  a main program using the library
 add_executable(Main DataReaderMain.cxx)

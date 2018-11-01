@@ -22,49 +22,24 @@
 #include "UParticle.h"
 
 #include "ListOfPDG.h"
+#include "DRBase.h"
 
-struct FileType
-{
-  Bool_t isASCII;
-  Bool_t isROOT;
-  Bool_t isGZ;
-  ClassDef(FileType, 0);
-};
-
-struct InputFile
-{
-  TFile *ROOT;
-  std::ifstream ASCII;
-  gzFile GZ;
-  ClassDef(InputFile, 0);
-};
-
-struct ModelType
-{
-  Bool_t isURQMD;
-  Bool_t isLAQGSM;
-  Bool_t isPHSD;
-  Bool_t isPHQMD;
-  Bool_t isDCMQGSM;
-  ClassDef(ModelType, 0);
-};
-
-class DataReader
+class DataReader : public DRBase
 {
 public:
   DataReader();
   ~DataReader();
 
-  Bool_t InitInputFile(TString _name);
-  void InitOutputTreeFile(TString _name);
-  void InitOutputHistFile(TString _name);
-  Bool_t ReadFile(TString _name);
-  void InitTree(TString _treeName, TString _treeTitle);
-  void InitDRETree(TString _treeName, TString _treeTitle);
-  void ScaleYildHists(Double_t _NumberOfFiles);
-  void WriteTree();
-  void WriteHist();
-  void InitCentralityMethod();
+  // virtual Bool_t InitInputFile(TString _name);
+  virtual void InitOutputTreeFile(TString _name);
+  virtual void InitOutputHistFile(TString _name);
+  virtual Bool_t ReadFile(TString _name);
+  virtual void InitTree(TString _treeName, TString _treeTitle);
+  virtual void InitDRETree(TString _treeName, TString _treeTitle);
+  virtual void ScaleYildHists(Double_t _NumberOfFiles);
+  virtual void WriteTree();
+  virtual void WriteHist();
+  virtual void InitCentralityMethod();
 
 private:
   void FillTree();
@@ -74,22 +49,22 @@ private:
   void ReadLAQGSM_type2();
   void ReadPHSD();
   Bool_t eof();
-  std::string GetLine();
-  Bool_t OpenInputFile(TString _name);
+  // std::string GetLine();
+  // Bool_t OpenInputFile(TString _name);
   Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass);
   // std::map<Int_t, Int_t> InitPDGDictionary();
   void InitPlotter();
   TFile *oTreeFile = {nullptr};
   TFile *oHistFile = {nullptr};
-  InputFile iFile;
+  // InputFile iFile;
   TString outputFileName = "";
   TTree *fTree = {nullptr};
   TTree *fDRETree = {nullptr};
   DataReaderPlotter *fPlotter = {nullptr};
 
 protected:
-  FileType fFileType;
-  ModelType fModelType;
+  // FileType fFileType;
+  // ModelType fModelType;
   DataReaderEvent *fEvent;
   Bool_t isTreeInitialized = false;
   Bool_t isDRETreeInitialized = false;
