@@ -16,6 +16,8 @@ public:
 private:
   static const int skipLinesHeader = 12;
   static const int skipLinesEvent = 3;
+
+  ClassDef(DRurqmd,0);
 };
 
 #endif

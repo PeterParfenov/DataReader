@@ -84,11 +84,11 @@ int main(int argc, char **argv)
   DataReader *dR = new DataReader();
   dR->InitTree("tree", "Basic QA tree");
   // dR->InitDRETree("DRETree", "Basic QA tree w/ DataReaderEvent class");
-  if (isTree) dR->InitOutputTreeFile(outFileName);
-  if (isHist) dR->InitOutputHistFile(outFileName);
   if (isCentralityMethod) dR->InitCentralityMethod();
   dR->ReadFile(inFileName);
   dR->ScaleYildHists(Norm);
+  if (isTree) dR->InitOutputTreeFile(outFileName);
+  if (isHist) dR->InitOutputHistFile(outFileName);
   if (isTree) dR->WriteTree();
   if (isHist) dR->WriteHist();
 

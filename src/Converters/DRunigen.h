@@ -17,6 +17,8 @@ public:
 
   virtual DataReaderEvent* ReadUNIGENEvent(UEvent *uEvent, TTree* tree, Long_t iEvent);
   static const int TimeStep = 1;
+
+  ClassDef(DRunigen,0);
 };
 
 #endif

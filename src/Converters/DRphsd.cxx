@@ -62,3 +62,5 @@ DataReaderEvent *DRphsd::ReadPHSDEvent()
   }
   return lEvent;
 }
+
+ClassImp(DRphsd);

@@ -28,6 +28,8 @@ private:
   Int_t fNP;                      // to read
   Int_t fipdg, fich, fipi5;       // to read
   Double_t fP[4], fR[4];          // to read
+
+  ClassDef(DRphsd,0);
 };
 
 #endif

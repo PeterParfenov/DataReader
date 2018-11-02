@@ -20,6 +20,8 @@ private:
   static const int skipLinesHeader = 12;
   static const int skipLinesEvent = 5;
   static const Int_t fQGSM_format_ID = 2;
+
+  ClassDef(DRlaqgsm,0);
 };
 
 #endif

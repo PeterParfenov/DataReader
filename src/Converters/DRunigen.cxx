@@ -41,4 +41,5 @@ DataReaderEvent *DRunigen::ReadUNIGENEvent(UEvent *uEvent, TTree* tree, Long_t i
   return lEvent;
 }
 
+ClassImp(DRunigen);
 // #endif

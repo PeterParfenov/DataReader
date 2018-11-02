@@ -125,12 +125,13 @@ private:
   std::map<TString, Int_t> NumberOfBinsCuts;
   std::map<TString, Int_t> NumberOfBinsFlow;
   std::map<TString, Int_t> NumberOfBinsFlowArray;
-  ClassDef(DataReaderPlotter, 0);
   Bool_t isYildInitialized;
   Bool_t isKinematicsInitialized;
   Bool_t isCutsInitialized;
   Bool_t isFlowInitialized;
   Bool_t isCentralityDetermined;
+
+  ClassDef(DataReaderPlotter, 0);
 };
 
 #endif

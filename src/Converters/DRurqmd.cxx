@@ -64,3 +64,5 @@ DataReaderEvent* DRurqmd::ReadURQMDEvent()
   }
   return lEvent;
 }
+
+ClassImp(DRurqmd);

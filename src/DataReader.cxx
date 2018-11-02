@@ -67,14 +67,12 @@ Bool_t DataReader::ReadFile(TString _name)
       fPlotter->Fill(ReadUNIGENEvent(uEvent, tree, iEvent), 1.);
     }
   }
-  // ReadUNIGEN();
 
   if (fFileType.isASCII && fModelType.isLAQGSM)
   {
     SkipLine(5);
     while (!eof())
     {
-      // ReadLAQGSM_type2();
       fPlotter->Fill(ReadLAQGSMEvent(), 1.);
     }
   }
@@ -84,7 +82,6 @@ Bool_t DataReader::ReadFile(TString _name)
     {
       fPlotter->Fill(ReadPHSDEvent(), 1.);
     }
-  // ReadPHSD();
 
   if (fFileType.isROOT && fModelType.isDCMQGSM)
   {
@@ -102,83 +99,7 @@ Bool_t DataReader::ReadFile(TString _name)
       fPlotter->Fill(ReadUNIGENEvent(uEvent, tree, iEvent), 1.);
     }
   }
-  // ReadUNIGEN();
   return true;
-}
-
-void DataReader::ReadLAQGSM_type2()
-{
-  std::cout << "DataReader::ReadLAQGSM: Processing." << std::endl;
-  std::string str;
-  std::stringstream ss;
-
-  const int skipLinesHeader = 2;
-  const int skipLinesEvent = 8;
-
-  Double_t bx = 0., by = 0.;
-
-  // Int_t fQGSM_format_ID = 2;
-  str = GetLine();
-  // Skip lines
-  for (Int_t j = 0; j < skipLinesEvent - 1; j++)
-  {
-    str = GetLine();
-  }
-
-  while (!eof())
-  {
-    double rr;
-    DataReaderEvent *lEvent = new DataReaderEvent();
-    // fEvent->CleanEvent();
-    // Read impact parameter
-    ss.str("");
-    ss.clear();
-    str = GetLine();
-    if (str.empty())
-    {
-      std::cerr << "DataReader::ReadLAQGSM: [WARNING] line is empty. Skipping." << std::endl;
-      break;
-    }
-    ss << str;
-    ss >> lEvent->Nevent >> rr >> lEvent->Nparticles >> lEvent->B >> bx >> by;
-    lEvent->PsiRP = TMath::ATan2(by, bx);
-    // if (lEvent->Nevent % 1000 == 0)
-    std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
-              << "\n\tImpact parameter: " << lEvent->B << " fm."
-              << "\n\tNparticles: " << lEvent->Nparticles
-              << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
-    // if (lEvent->Nevent > 5) break;
-
-    // Loop on particles on all time in this event
-    Int_t iLeptonic = 0, iStrange = 0, iBaryonic = 0, iCode = 0, iCode1 = 0, iCode2 = 0;
-    Double_t pza = 0., pzb = 0;
-    for (Int_t j = 0; j < skipLinesHeader; j++)
-    {
-      str = GetLine();
-    }
-    for (Int_t j = 0; j < lEvent->Nparticles; j++)
-    {
-      ss.str("");
-      ss.clear();
-      str = GetLine();
-      ss << str;
-      // if (fQGSM_format_ID < 3)
-      // {
-      ss >> iCode >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j];
-      // }
-      lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange, lEvent->Charge[j], lEvent->M[j]);
-      lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
-      // printf("%+3i %+3i %+3i %+3i %+5i %+5i %+3i %+3.2f %+3.2f %+3.2f %3.2f    %+6i\n",lEvent->Charge[j], iLeptonic, iStrange, iBaryonic, iCode, iCode1, iCode2, lEvent->Px[j], lEvent->Py[j], lEvent->Pz[j], lEvent->M[j], lEvent->PID[j]);
-    }
-    fPlotter->Fill(lEvent, 1.);
-    fEvent = lEvent;
-    FillTree();
-    delete lEvent;
-    if (iFile.ASCII.eof())
-    {
-      break;
-    }
-  }
 }
 
 void DataReader::InitTree(TString _treeName, TString _treeTitle = "")
