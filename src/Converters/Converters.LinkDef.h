@@ -6,8 +6,15 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class DRBase+;
+
 #pragma link C++ class DRurqmd+;
 #pragma link C++ class DRlaqgsm+;
+
+#ifdef DR_UNIGEN_H
+#pragma link C++ class DRunigen+;
+#endif
+
+#pragma link C++ class DRphsd+;
 
 #pragma link C++ struct FileType+;
 #pragma link C++ struct ModelType+;

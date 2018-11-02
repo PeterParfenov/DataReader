@@ -25,14 +25,18 @@
 #include "DRBase.h"
 #include "DRurqmd.h"
 #include "DRlaqgsm.h"
+#include "DRphsd.h"
+// #ifdef UNIGEN_INSTALLED
+#include "DRunigen.h"
+// #endif
 
 class DataReader :
-#ifdef DR_URQMD_H
 public DRurqmd,
-#endif
-#ifdef DR_LAQGSM_H
 public DRlaqgsm,
-#endif
+// #ifdef UNIGEN_INSTALLED
+public DRunigen,
+// #endif
+public DRphsd,
 virtual DRBase
 
 {
@@ -53,28 +57,16 @@ public:
 
 private:
   void FillTree();
-  // void ReadUrQMD();
-  void ReadUNIGEN();
-  // void ReadLAQGSM();
   void ReadLAQGSM_type2();
-  void ReadPHSD();
-  // Bool_t eof();
-  // std::string GetLine();
-  // Bool_t OpenInputFile(TString _name);
-  // Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass);
-  // std::map<Int_t, Int_t> InitPDGDictionary();
   void InitPlotter();
   TFile *oTreeFile = {nullptr};
   TFile *oHistFile = {nullptr};
-  // InputFile iFile;
   TString outputFileName = "";
   TTree *fTree = {nullptr};
   TTree *fDRETree = {nullptr};
   DataReaderPlotter *fPlotter = {nullptr};
 
 protected:
-  // FileType fFileType;
-  // ModelType fModelType;
   DataReaderEvent *fEvent;
   Bool_t isTreeInitialized = false;
   Bool_t isDRETreeInitialized = false;

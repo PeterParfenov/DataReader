@@ -4,10 +4,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdlib>
 #include <zlib.h>
 
 #include "TFile.h"
-
 
 struct FileType
 {

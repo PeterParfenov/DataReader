@@ -11,7 +11,7 @@ public:
   DRurqmd(){};
   ~DRurqmd(){};
 
-  DataReaderEvent* ReadURQMDEvent();
+  virtual DataReaderEvent* ReadURQMDEvent();
 
 private:
   static const int skipLinesHeader = 12;

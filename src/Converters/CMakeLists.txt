@@ -1,11 +1,15 @@
 set(Converters_header_files
   DRurqmd.h
   DRlaqgsm.h
+  DRphsd.h
+  DRunigen.h
   DRBase.h
 )
 set(Converters_cxx_files
   DRurqmd.cxx
   DRlaqgsm.cxx
+  DRphsd.cxx
+  DRunigen.cxx
   DRBase.cxx
 )
 
