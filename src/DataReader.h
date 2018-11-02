@@ -24,8 +24,17 @@
 #include "ListOfPDG.h"
 #include "DRBase.h"
 #include "DRurqmd.h"
+#include "DRlaqgsm.h"
 
-class DataReader : public DRurqmd
+class DataReader :
+#ifdef DR_URQMD_H
+public DRurqmd,
+#endif
+#ifdef DR_LAQGSM_H
+public DRlaqgsm,
+#endif
+virtual DRBase
+
 {
 public:
   DataReader();
@@ -46,13 +55,13 @@ private:
   void FillTree();
   // void ReadUrQMD();
   void ReadUNIGEN();
-  void ReadLAQGSM();
+  // void ReadLAQGSM();
   void ReadLAQGSM_type2();
   void ReadPHSD();
   // Bool_t eof();
   // std::string GetLine();
   // Bool_t OpenInputFile(TString _name);
-  Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass);
+  // Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass);
   // std::map<Int_t, Int_t> InitPDGDictionary();
   void InitPlotter();
   TFile *oTreeFile = {nullptr};

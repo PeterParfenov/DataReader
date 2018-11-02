@@ -5,7 +5,7 @@
 #include "DRBase.h"
 #include "ListOfPDG.h"
 
-class DRurqmd : public DRBase
+class DRurqmd : virtual DRBase
 {
 public:
   DRurqmd(){};

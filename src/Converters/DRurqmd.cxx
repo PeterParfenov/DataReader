@@ -9,7 +9,7 @@ DataReaderEvent* DRurqmd::ReadURQMDEvent()
   str = GetLine();
   if (str.empty())
   {
-    std::cerr << "DataReader::ReadUrQMD: [WARNING] line is empty. Skipping." << std::endl;
+    std::cerr << "DRurqmd::ReadURQMDEvent: [WARNING] line is empty. Skipping." << std::endl;
     return lEvent;
   }
   // fEvent->CleanEvent();
@@ -44,7 +44,7 @@ DataReaderEvent* DRurqmd::ReadURQMDEvent()
     ss << str;
     ss >> lEvent->Nparticles >> lEvent->Time;
     if (lEvent->Nevent % 1000 == 0)
-      std::cout << "DataReader::ReadUrQMD: Event " << lEvent->Nevent
+      std::cout << "DRurqmd::ReadURQMDEvent: Event " << lEvent->Nevent
                 << "\n\tImpact parameter: " << lEvent->B << " fm."
                 << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
     str = GetLine();

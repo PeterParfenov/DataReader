@@ -43,11 +43,12 @@ public:
   ~DRBase(){};
 
   // std::string GetLine(std::ifstream text);
-  std::string GetLine();
-  Bool_t eof();
+  virtual std::string GetLine();
+  virtual Bool_t eof();
 
-  Bool_t OpenInputFile(TString _name);
-  Bool_t InitInputFile(TString _name);
+  virtual Bool_t OpenInputFile(TString _name);
+  virtual Bool_t InitInputFile(TString _name);
+  virtual void SkipLine(Int_t nLines);
 
   FileType fFileType;
   ModelType fModelType;

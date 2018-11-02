@@ -1,9 +1,11 @@
 set(Converters_header_files
   DRurqmd.h
+  DRlaqgsm.h
   DRBase.h
 )
 set(Converters_cxx_files
   DRurqmd.cxx
+  DRlaqgsm.cxx
   DRBase.cxx
 )
 

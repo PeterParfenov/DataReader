@@ -20,39 +20,39 @@ Bool_t DRBase::OpenInputFile(TString _name)
 {
   if (fFileType.isASCII && fFileType.isROOT)
   {
-    std::cerr << "DataReader::OpenInputFile: Incopetent file type." << std::endl;
+    std::cerr << "DRBase::OpenInputFile: Incopetent file type." << std::endl;
     return false;
   }
   if (fFileType.isASCII)
   {
     if (fFileType.isGZ)
     {
-      std::cout << "DataReader::OpenInputFile: Input file type: GZIPPED ASCII" << std::endl;
+      std::cout << "DRBase::OpenInputFile: Input file type: GZIPPED ASCII" << std::endl;
       iFile.GZ = gzopen(_name.Data(), "rb");
       if (!iFile.GZ)
       {
-        std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+        std::cerr << "DRBase::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
         return false;
       }
     }
     if (!fFileType.isGZ)
     {
-      std::cout << "DataReader::OpenInputFile: Input file type: ASCII" << std::endl;
+      std::cout << "DRBase::OpenInputFile: Input file type: ASCII" << std::endl;
       iFile.ASCII.open(_name.Data());
       if (!iFile.ASCII.is_open())
       {
-        std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+        std::cerr << "DRBase::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
         return false;
       }
     }
   }
   if (fFileType.isROOT)
   {
-    std::cout << "DataReader::OpenInputFile: Input file type: ROOT" << std::endl;
+    std::cout << "DRBase::OpenInputFile: Input file type: ROOT" << std::endl;
     iFile.ROOT = new TFile(_name.Data(), "read");
     if (iFile.ROOT->IsZombie())
     {
-      std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
+      std::cerr << "DRBase::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
       return false;
     }
   }
@@ -61,7 +61,7 @@ Bool_t DRBase::OpenInputFile(TString _name)
 
 Bool_t DRBase::InitInputFile(TString _name)
 {
-  std::cout << "DataReader::InitInputFile: Processing." << std::endl;
+  std::cout << "DRBase::InitInputFile: Processing." << std::endl;
   if (_name.Contains(".f14"))
   {
     fFileType.isASCII = true;
@@ -96,28 +96,27 @@ Bool_t DRBase::InitInputFile(TString _name)
 
   if (fModelType.isURQMD)
   {
-    std::cout << "DataReader::InitInputFile: Input model type: UrQMD" << std::endl;
+    std::cout << "DRBase::InitInputFile: Input model type: UrQMD" << std::endl;
   }
   if (fModelType.isLAQGSM)
   {
-    std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
+    std::cout << "DRBase::InitInputFile: Input model type: LAQGSM" << std::endl;
   }
   if (fModelType.isPHSD)
   {
-    std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
+    std::cout << "DRBase::InitInputFile: Input model type: PHSD" << std::endl;
   }
   if (fModelType.isPHQMD)
   {
-    std::cout << "DataReader::InitInputFile: Input model type: PHQMD" << std::endl;
+    std::cout << "DRBase::InitInputFile: Input model type: PHQMD" << std::endl;
   }
   if (fModelType.isDCMQGSM)
   {
-    std::cout << "DataReader::InitInputFile: Input model type: DCMQGSM" << std::endl;
+    std::cout << "DRBase::InitInputFile: Input model type: DCMQGSM" << std::endl;
   }
   Bool_t result = OpenInputFile(_name);
   return result;
 }
-
 
 Bool_t DRBase::eof()
 {
@@ -130,6 +129,15 @@ Bool_t DRBase::eof()
     return (iFile.ASCII.eof());
   }
   return true;
+}
+
+void DRBase::SkipLine(Int_t nLines)
+{
+  // Skip lines
+  for (Int_t j = 0; j < nLines - 1; j++)
+  {
+    GetLine();
+  }
 }
 
 ClassImp(DRBase);
