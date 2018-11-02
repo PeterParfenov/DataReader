@@ -3,6 +3,7 @@
 
 #include "DataReaderEvent.h"
 #include "DRBase.h"
+#include "ListOfPDG.h"
 
 class DRurqmd : public DRBase
 {
@@ -10,7 +11,7 @@ public:
   DRurqmd(){};
   ~DRurqmd(){};
 
-  DataReaderEvent ReadURQMDEvent();
+  DataReaderEvent* ReadURQMDEvent();
 
 private:
   static const int skipLinesHeader = 12;

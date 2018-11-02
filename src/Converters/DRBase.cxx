@@ -118,4 +118,18 @@ Bool_t DRBase::InitInputFile(TString _name)
   return result;
 }
 
+
+Bool_t DRBase::eof()
+{
+  if (fFileType.isASCII && fFileType.isGZ)
+  {
+    return (gzeof(iFile.GZ));
+  }
+  if (fFileType.isASCII && !fFileType.isGZ)
+  {
+    return (iFile.ASCII.eof());
+  }
+  return true;
+}
+
 ClassImp(DRBase);

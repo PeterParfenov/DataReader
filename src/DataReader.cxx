@@ -19,65 +19,6 @@ void DataReader::InitCentralityMethod()
   isCentralityMethod = true;
 }
 
-// Bool_t DataReader::InitInputFile(TString _name)
-// {
-//   std::cout << "DataReader::InitInputFile: Processing." << std::endl;
-//   if (_name.Contains(".f14"))
-//   {
-//     fFileType.isASCII = true;
-//     fModelType.isURQMD = true;
-//   }
-//   if (_name.Contains(".gz"))
-//   {
-//     fFileType.isGZ = true;
-//   }
-//   if (_name.Contains("phsd") || _name.Contains("PHSD"))
-//   {
-//     fFileType.isASCII = true;
-//     fModelType.isPHSD = true;
-//   }
-//   if (_name.Contains(".r12"))
-//   {
-//     fFileType.isASCII = true;
-//     fModelType.isLAQGSM = true;
-//   }
-//   if (_name.Contains(".root"))
-//   {
-//     fFileType.isROOT = true;
-//     if (_name.Contains("UNIGEN") || _name.Contains("PHQMD") || _name.Contains("unigen") || _name.Contains("phqmd"))
-//     {
-//       fModelType.isPHQMD = true;
-//     }
-//     if (_name.Contains("dcmqgsm") || _name.Contains("DCMQGSM"))
-//     {
-//       fModelType.isDCMQGSM = true;
-//     }
-//   }
-
-//   if (fModelType.isURQMD)
-//   {
-//     std::cout << "DataReader::InitInputFile: Input model type: UrQMD" << std::endl;
-//   }
-//   if (fModelType.isLAQGSM)
-//   {
-//     std::cout << "DataReader::InitInputFile: Input model type: LAQGSM" << std::endl;
-//   }
-//   if (fModelType.isPHSD)
-//   {
-//     std::cout << "DataReader::InitInputFile: Input model type: PHSD" << std::endl;
-//   }
-//   if (fModelType.isPHQMD)
-//   {
-//     std::cout << "DataReader::InitInputFile: Input model type: PHQMD" << std::endl;
-//   }
-//   if (fModelType.isDCMQGSM)
-//   {
-//     std::cout << "DataReader::InitInputFile: Input model type: DCMQGSM" << std::endl;
-//   }
-//   Bool_t result = OpenInputFile(_name);
-//   return result;
-// }
-
 void DataReader::InitOutputTreeFile(TString _name)
 {
   TString name;
@@ -105,97 +46,21 @@ Bool_t DataReader::ReadFile(TString _name)
   InitPlotter();
 
   if (fFileType.isASCII && fModelType.isURQMD)
-    ReadUrQMD();
+    while (!DRBase::eof())
+    {
+      fPlotter->Fill(ReadURQMDEvent(), 1.);
+    }
   if (fFileType.isROOT && fModelType.isPHQMD)
     ReadUNIGEN();
   if (fFileType.isASCII && fModelType.isLAQGSM)
-    ReadLAQGSM_type2();
-    // ReadLAQGSM();
+    // ReadLAQGSM_type2();
+    ReadLAQGSM();
   if (fFileType.isASCII && fModelType.isPHSD)
     ReadPHSD();
   if (fFileType.isROOT && fModelType.isDCMQGSM)
     ReadUNIGEN();
 
   return true;
-}
-
-void DataReader::ReadUrQMD()
-{
-  std::cout << "DataReader::ReadUrQMD: Processing." << std::endl;
-  std::string str;
-  std::stringstream ss;
-
-  const int skipLinesHeader = 12;
-  const int skipLinesEvent = 3;
-
-  while (!eof())
-  {
-    str = GetLine();
-    DataReaderEvent *lEvent = new DataReaderEvent();
-    if (str.empty())
-    {
-      std::cerr << "DataReader::ReadUrQMD: [WARNING] line is empty. Skipping." << std::endl;
-      break;
-    }
-    // fEvent->CleanEvent();
-    if (str[0] != ' ')
-    {
-      // Skip lines
-      for (Int_t j = 0; j < skipLinesEvent - 1; j++)
-      {
-        str = GetLine();
-      }
-      // Read impact parameter
-      ss.str("");
-      ss.clear();
-      str = GetLine();
-      ss << str;
-      ss >> str >> lEvent->B;
-      str = GetLine();
-      // Read number of event
-      ss.str("");
-      ss.clear();
-      str = GetLine();
-      ss << str;
-      ss >> str >> lEvent->Nevent;
-      for (Int_t j = 0; j < skipLinesHeader; j++)
-      {
-        str = GetLine();
-      }
-
-      // Read number of particles and time
-      ss.str("");
-      ss.clear();
-      ss << str;
-      ss >> lEvent->Nparticles >> lEvent->Time;
-      if (lEvent->Nevent % 1000 == 0)
-        std::cout << "DataReader::ReadUrQMD: Event " << lEvent->Nevent
-                  << "\n\tImpact parameter: " << lEvent->B << " fm."
-                  << "\n\tNparticles: " << lEvent->Nparticles << std::endl;
-      str = GetLine();
-      // Loop on particles on all time in this event
-      Int_t i3, lcl, ncl, orr, itype;
-      for (Int_t j = 0; j < lEvent->Nparticles; j++)
-      {
-        ss.str("");
-        ss.clear();
-        str = GetLine();
-        ss << str;
-        ss >> lEvent->r0[j] >> lEvent->rX[j] >> lEvent->rY[j] >> lEvent->rZ[j] >> lEvent->E[j] >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j] >> itype >> i3 >> lEvent->Charge[j] >> lcl >> ncl >> orr;
-        lEvent->PID[j] = (particleURQMD.find(TMath::Abs(itype)) != particleURQMD.end()) ? TMath::Sign(particleURQMD.at(TMath::Abs(itype)), lEvent->Charge[j]) : -999.;
-        if (lEvent->PID[j] > 3122 || lEvent->Charge[j] > 10)
-          std::cout << "PID: " << lEvent->PID[j] << " Charge: " << lEvent->Charge[j] << std::endl;
-      }
-      fPlotter->Fill(lEvent, 1.);
-      fEvent = lEvent;
-      FillTree();
-      delete lEvent;
-    }
-    if (iFile.ASCII.eof())
-    {
-      break;
-    }
-  }
 }
 
 void DataReader::ReadUNIGEN()
@@ -362,10 +227,10 @@ void DataReader::ReadLAQGSM_type2()
     ss >> lEvent->Nevent >> rr >> lEvent->Nparticles >> lEvent->B >> bx >> by;
     lEvent->PsiRP = TMath::ATan2(by, bx);
     // if (lEvent->Nevent % 1000 == 0)
-      std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
-                << "\n\tImpact parameter: " << lEvent->B << " fm."
-                << "\n\tNparticles: " << lEvent->Nparticles
-                << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
+    std::cout << "DataReader::ReadLAQGSM: Event " << lEvent->Nevent
+              << "\n\tImpact parameter: " << lEvent->B << " fm."
+              << "\n\tNparticles: " << lEvent->Nparticles
+              << "\n\tPsiRP: " << lEvent->PsiRP << std::endl;
     // if (lEvent->Nevent > 5) break;
 
     // Loop on particles on all time in this event
@@ -383,7 +248,7 @@ void DataReader::ReadLAQGSM_type2()
       ss << str;
       // if (fQGSM_format_ID < 3)
       // {
-        ss >> iCode >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j];
+      ss >> iCode >> lEvent->Charge[j] >> iLeptonic >> iStrange >> iBaryonic >> iCode >> iCode1 >> iCode2 >> lEvent->Px[j] >> lEvent->Py[j] >> lEvent->Pz[j] >> lEvent->M[j];
       // }
       lEvent->PID[j] = GetLAQGSMPDG(j, iBaryonic, iLeptonic, iStrange, lEvent->Charge[j], lEvent->M[j]);
       lEvent->E[j] = TMath::Sqrt(lEvent->Px[j] * lEvent->Px[j] + lEvent->Py[j] * lEvent->Py[j] + lEvent->Pz[j] * lEvent->Pz[j] + lEvent->M[j] * lEvent->M[j]);
@@ -755,77 +620,5 @@ Int_t DataReader::GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, I
   }
   return PDG;
 }
-
-Bool_t DataReader::eof()
-{
-  if (fFileType.isASCII && fFileType.isGZ)
-  {
-    return (gzeof(iFile.GZ));
-  }
-  if (fFileType.isASCII && !fFileType.isGZ)
-  {
-    return (iFile.ASCII.eof());
-  }
-  return true;
-}
-
-// std::string DataReader::GetLine()
-// {
-//   std::string str;
-//   char _buffer[256];
-//   if (fFileType.isASCII && fFileType.isGZ)
-//   {
-//     gzgets(iFile.GZ, _buffer, 256);
-//     str = (std::string)_buffer;
-//   }
-//   if (fFileType.isASCII && !fFileType.isGZ)
-//   {
-//     getline(iFile.ASCII, str);
-//   }
-//   return str;
-// }
-
-// Bool_t DataReader::OpenInputFile(TString _name)
-// {
-//   if (fFileType.isASCII && fFileType.isROOT)
-//   {
-//     std::cerr << "DataReader::OpenInputFile: Incopetent file type." << std::endl;
-//     return false;
-//   }
-//   if (fFileType.isASCII)
-//   {
-//     if (fFileType.isGZ)
-//     {
-//       std::cout << "DataReader::OpenInputFile: Input file type: GZIPPED ASCII" << std::endl;
-//       iFile.GZ = gzopen(_name.Data(), "rb");
-//       if (!iFile.GZ)
-//       {
-//         std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-//         return false;
-//       }
-//     }
-//     if (!fFileType.isGZ)
-//     {
-//       std::cout << "DataReader::OpenInputFile: Input file type: ASCII" << std::endl;
-//       iFile.ASCII.open(_name.Data());
-//       if (!iFile.ASCII.is_open())
-//       {
-//         std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-//         return false;
-//       }
-//     }
-//   }
-//   if (fFileType.isROOT)
-//   {
-//     std::cout << "DataReader::OpenInputFile: Input file type: ROOT" << std::endl;
-//     iFile.ROOT = new TFile(_name.Data(), "read");
-//     if (iFile.ROOT->IsZombie())
-//     {
-//       std::cerr << "DataReader::OpenInputFile: Attached file " << _name.Data() << " was not opened." << std::endl;
-//       return false;
-//     }
-//   }
-//   return true;
-// }
 
 ClassImp(DataReader);

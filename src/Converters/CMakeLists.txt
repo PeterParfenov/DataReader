@@ -1,9 +1,9 @@
 set(Converters_header_files
-  # DRurqmd.h
+  DRurqmd.h
   DRBase.h
 )
 set(Converters_cxx_files
-  # DRurqmd.cxx
+  DRurqmd.cxx
   DRBase.cxx
 )
 

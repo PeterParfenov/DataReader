@@ -23,8 +23,9 @@
 
 #include "ListOfPDG.h"
 #include "DRBase.h"
+#include "DRurqmd.h"
 
-class DataReader : public DRBase
+class DataReader : public DRurqmd
 {
 public:
   DataReader();
@@ -43,12 +44,12 @@ public:
 
 private:
   void FillTree();
-  void ReadUrQMD();
+  // void ReadUrQMD();
   void ReadUNIGEN();
   void ReadLAQGSM();
   void ReadLAQGSM_type2();
   void ReadPHSD();
-  Bool_t eof();
+  // Bool_t eof();
   // std::string GetLine();
   // Bool_t OpenInputFile(TString _name);
   Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass);

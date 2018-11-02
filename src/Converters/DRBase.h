@@ -44,6 +44,7 @@ public:
 
   // std::string GetLine(std::ifstream text);
   std::string GetLine();
+  Bool_t eof();
 
   Bool_t OpenInputFile(TString _name);
   Bool_t InitInputFile(TString _name);
