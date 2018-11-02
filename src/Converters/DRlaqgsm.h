@@ -11,7 +11,7 @@ class DRlaqgsm : virtual DRBase
 {
 public:
   DRlaqgsm(){};
-  ~DRlaqgsm(){};
+  virtual ~DRlaqgsm(){};
 
   DataReaderEvent* ReadLAQGSMEvent();
   Int_t GetLAQGSMPDG(Int_t iTrack, Int_t _baryonic, Int_t _leptonic, Int_t _strange, Int_t charge, Double_t mass);

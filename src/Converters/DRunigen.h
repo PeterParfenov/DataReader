@@ -13,7 +13,7 @@ class DRunigen : virtual DRBase
 {
 public:
   DRunigen(){};
-  ~DRunigen(){};
+  virtual ~DRunigen(){};
 
   virtual DataReaderEvent* ReadUNIGENEvent(UEvent *uEvent, TTree* tree, Long_t iEvent);
   static const int TimeStep = 1;

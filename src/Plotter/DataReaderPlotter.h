@@ -96,17 +96,17 @@ class DataReaderPlotter
 {
 public:
   DataReaderPlotter();
-  ~DataReaderPlotter();
+  virtual ~DataReaderPlotter();
 
-  void Fill(DataReaderEvent *_event, Double_t _weight);
-  void Write(TFile *_file);
-  void ScaleAllHist(Double_t _scale);
-  void ScaleYildsForAllDataset(Double_t _scale);
-  void InitYild();
-  void InitKinematics();
-  void InitCuts();
-  void InitFlow();
-  void DetermineCentrality();
+  virtual void Fill(DataReaderEvent *_event, Double_t _weight);
+  virtual void Write(TFile *_file);
+  virtual void ScaleAllHist(Double_t _scale);
+  virtual void ScaleYildsForAllDataset(Double_t _scale);
+  virtual void InitYild();
+  virtual void InitKinematics();
+  virtual void InitCuts();
+  virtual void InitFlow();
+  virtual void DetermineCentrality();
 
 private:
   std::map<TString, TH1D *> fHistogramYild;

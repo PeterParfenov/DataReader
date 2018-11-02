@@ -9,7 +9,7 @@ class DRurqmd : virtual DRBase
 {
 public:
   DRurqmd(){};
-  ~DRurqmd(){};
+  virtual ~DRurqmd(){};
 
   virtual DataReaderEvent* ReadURQMDEvent();
 

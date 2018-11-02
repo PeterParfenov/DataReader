@@ -11,7 +11,7 @@ class DRphsd : virtual DRBase
 {
 public:
   DRphsd(){fCount = 0;};
-  ~DRphsd(){};
+  virtual ~DRphsd(){};
 
   virtual DataReaderEvent* ReadPHSDEvent();
 

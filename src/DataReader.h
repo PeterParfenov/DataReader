@@ -42,7 +42,7 @@ virtual DRBase
 {
 public:
   DataReader();
-  ~DataReader();
+  virtual ~DataReader();
 
   // virtual Bool_t InitInputFile(TString _name);
   virtual void InitOutputTreeFile(TString _name);

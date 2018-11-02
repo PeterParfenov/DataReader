@@ -40,7 +40,7 @@ class DRBase
 {
 public:
   DRBase(){};
-  ~DRBase(){};
+  virtual ~DRBase(){};
 
   // std::string GetLine(std::ifstream text);
   virtual std::string GetLine();

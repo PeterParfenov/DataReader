@@ -16,8 +16,8 @@ class DataReaderEvent
 {
 public:
   DataReaderEvent();
-  ~DataReaderEvent();
-  void CleanEvent();
+  virtual ~DataReaderEvent();
+  virtual void CleanEvent();
   Double_t B;
   Double_t PsiRP;
   Int_t Nevent;
