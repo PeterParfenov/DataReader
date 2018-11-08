@@ -4,6 +4,7 @@ set(Converters_header_files
   DRphsd.h
   DRunigen.h
   DRBase.h
+  DRManager.h
 )
 set(Converters_cxx_files
   DRurqmd.cxx
@@ -11,6 +12,7 @@ set(Converters_cxx_files
   DRphsd.cxx
   DRunigen.cxx
   DRBase.cxx
+  DRManager.cxx
 )
 
 #---Generate dictionary for Converters
@@ -22,4 +24,4 @@ add_library(Converters SHARED
 ${Converters_cxx_files}
 G__Converters.cxx)
 
-target_link_libraries(Converters Event)
+target_link_libraries(Converters Plotter)

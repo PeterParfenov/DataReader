@@ -15,6 +15,7 @@
 #endif
 
 #pragma link C++ class DRphsd+;
+#pragma link C++ class DRManager+;
 
 #pragma link C++ struct FileType+;
 #pragma link C++ struct ModelType+;

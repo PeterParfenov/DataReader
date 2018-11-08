@@ -18,36 +18,18 @@
 #include "DataReaderEvent.h"
 #include "DataReaderPlotter.h"
 
-#include "UEvent.h"
-#include "UParticle.h"
+#include "DRManager.h"
 
-#include "ListOfPDG.h"
-#include "DRBase.h"
-#include "DRurqmd.h"
-#include "DRlaqgsm.h"
-#include "DRphsd.h"
-// #ifdef UNIGEN_INSTALLED
-#include "DRunigen.h"
-// #endif
-
-class DataReader :
-public DRurqmd,
-public DRlaqgsm,
-// #ifdef UNIGEN_INSTALLED
-public DRunigen,
-// #endif
-public DRphsd,
-virtual DRBase
+class DataReader : public DRManager,
+                   virtual DRBase
 
 {
 public:
   DataReader();
   virtual ~DataReader();
 
-  // virtual Bool_t InitInputFile(TString _name);
   virtual void InitOutputTreeFile(TString _name);
   virtual void InitOutputHistFile(TString _name);
-  virtual Bool_t ReadFile(TString _name);
   virtual void InitTree(TString _treeName, TString _treeTitle);
   virtual void InitDRETree(TString _treeName, TString _treeTitle);
   virtual void ScaleYildHists(Double_t _NumberOfFiles);
@@ -57,14 +39,11 @@ public:
 
 private:
   void FillTree();
-  void ReadLAQGSM_type2();
-  void InitPlotter();
   TFile *oTreeFile = {nullptr};
   TFile *oHistFile = {nullptr};
   TString outputFileName = "";
   TTree *fTree = {nullptr};
   TTree *fDRETree = {nullptr};
-  DataReaderPlotter *fPlotter = {nullptr};
 
 protected:
   DataReaderEvent *fEvent;
@@ -72,7 +51,6 @@ protected:
   Bool_t isDRETreeInitialized = false;
   Bool_t isOutputTreeFileInitialized = false;
   Bool_t isOutputHistFileInitialized = false;
-  Bool_t isCentralityMethod = false;
 
   ClassDef(DataReader, 0);
 };

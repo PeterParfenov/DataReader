@@ -1,5 +1,7 @@
 *root
 build/
+src/cmake-build-debug/
+src/.idea/
 scripts/
 .gitignore
 .vscode/
