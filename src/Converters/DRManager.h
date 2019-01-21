@@ -36,6 +36,7 @@ public:
   virtual ~DRManager();
 
   virtual Bool_t ReadFile(TString _name);
+  virtual Bool_t ReadMult(TString _name);
   virtual void InitPlotter();
 
   DataReaderPlotter *fPlotter = {nullptr};

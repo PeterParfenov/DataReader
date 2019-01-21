@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   Bool_t isCentralityMethod = false;
   if (argc < 5)
   {
-    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [--tree or --hist] [OPTIONAL: -Nfiles NFILES, --centrality-method]" << std::endl;
+    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [OPTIONAL: -Nfiles NFILES, --centrality-method]" << std::endl;
     return 10;
   }
 
@@ -25,9 +25,7 @@ int main(int argc, char **argv)
     if (std::string(argv[i]) != "-i" &&
         std::string(argv[i]) != "-o" &&
         std::string(argv[i]) != "-Nfiles" &&
-        std::string(argv[i]) != "--tree" &&
-        std::string(argv[i]) != "--centrality-method" &&
-        std::string(argv[i]) != "--hist")
+        std::string(argv[i]) != "--centrality-method")
     {
       std::cerr << "\nDataReaderMain: Unknown parameter: " << i << ": " << argv[i] << std::endl;
       return 10;
@@ -61,20 +59,15 @@ int main(int argc, char **argv)
         std::cerr << "\nDataReaderMain: Number of files was not specified!" << std::endl;
         return 22;
       }
-      if (std::string(argv[i]) == "--tree")
-      {
-        isTree = true;
-      }
-      if (std::string(argv[i]) == "--hist")
-      {
-        isHist = true;
-      }
       if (std::string(argv[i]) == "--centrality-method")
       {
         isCentralityMethod = true;
       }
     }
   }
+
+  isHist = true;
+  isTree = false;
 
   if ( (!isTree && !isHist) || (isTree && isHist) ){
     std::cerr << "\nDataReaderMain: --tree OR --hist option must be specified." << std::endl;

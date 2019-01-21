@@ -24,4 +24,4 @@ add_library(Converters SHARED
 ${Converters_cxx_files}
 G__Converters.cxx)
 
-target_link_libraries(Converters Plotter)
+target_link_libraries(Converters Plotter ${UNIGEN_LIB})

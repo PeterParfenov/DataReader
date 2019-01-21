@@ -18,33 +18,28 @@ message("Checking UniGen:")
 if(DEFINED ENV{UNIGEN})
   message("UniGen found: " $ENV{UNIGEN})
 
-  set(UNIGEN_INCLUDE $ENV{UNIGEN}/base/include)
-  set(UNIGEN_LIB $ENV{UNIGEN}/lib)
+  set(UNIGEN_ENV $ENV{UNIGEN})
+  set(UNIGEN_INCLUDE ${UNIGEN_ENV}/base/include)
+  set(UNIGEN_LIB_DIR ${UNIGEN_ENV}/lib)
   set(UNIGEN libUniGen.so)
-  link_directories(${UNIGEN_LIB})
+  #link_directories(${UNIGEN_LIB})
+  find_library(UNIGEN_LIB REQUIRED
+    NAMES ${UNIGEN}
+    HINTS ${UNIGEN_LIB_DIR} ${UNIGEN_ENV})
 
 else(DEFINED ENV{UNIGEN})
-  message("UniGen not found")
+  message(FATAL_ERROR "UniGen not found")
 endif(DEFINED ENV{UNIGEN})
 
-if(DEFINED ENV{UNIGEN})
-  set(INCLUDE_DIRECTORIES
+set(INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/Converters
     ${CMAKE_SOURCE_DIR}/Event
     ${CMAKE_SOURCE_DIR}/Plotter
+    ${CMAKE_SOURCE_DIR}/CentralityManager
     ${ROOT_INCLUDE_DIRS}
     ${UNIGEN_INCLUDE}
-  )
-else(DEFINED ENV{UNIGEN})
-  set(INCLUDE_DIRECTORIES
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/Converters
-    ${CMAKE_SOURCE_DIR}/Event
-    ${CMAKE_SOURCE_DIR}/Plotter
-    ${ROOT_INCLUDE_DIRS}
-  )
-endif(DEFINED ENV{UNIGEN})
+)
 
 include_directories(${INCLUDE_DIRECTORIES}
 )
@@ -56,6 +51,7 @@ set(CMAKE_C_FLAGS "-O2")
 add_subdirectory(Event)
 add_subdirectory(Plotter)
 add_subdirectory(Converters)
+add_subdirectory(CentralityManager)
 
 #---Generate dictionary for DataReader
 ROOT_GENERATE_DICTIONARY(G__DataReader
@@ -67,12 +63,12 @@ add_library(DataReader SHARED
   DataReader.cxx
 G__DataReader.cxx)
 
-if(DEFINED ENV{UNIGEN})
-  target_link_libraries(DataReader Plotter Converters ${UNIGEN} ${ROOT_LIBRARIES})
-else(DEFINED ENV{UNIGEN})
-  target_link_libraries(DataReader Plotter Converters ${ROOT_LIBRARIES})
-endif(DEFINED ENV{UNIGEN})
+target_link_libraries(DataReader Converters ${UNIGEN} ${ROOT_LIBRARIES})
 
 #---Create  a main program using the library
 add_executable(Main DataReaderMain.cxx)
 target_link_libraries(Main DataReader)
+
+#---Create an executable file CentraltyManager
+add_executable(CMMain CentralityManagerMain.cpp)
+target_link_libraries(CMMain CentralityManager)
