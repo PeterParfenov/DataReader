@@ -1,9 +1,7 @@
 #include "DataReaderPlotter.h"
 #include <string>
 
-#ifndef PLOTTERFUNCTIONS
-#define PLOTTERFUNCTIONS
-Int_t GetMultiplicity(DataReaderEvent *_event, Double_t _eta)
+Int_t DataReaderPlotter::GetMultiplicity(DataReaderEvent *const &_event, Double_t _eta)
 {
   Int_t mult = 0;
   Double_t Eta, Pt, P;
@@ -20,13 +18,15 @@ Int_t GetMultiplicity(DataReaderEvent *_event, Double_t _eta)
   return mult;
 }
 
+#ifndef PLOTTERFUNCTIONS
+#define PLOTTERFUNCTIONS
 Double_t GetCentrality(Double_t _b)
 {
   Double_t rAu = 6.98;
   return (100.*TMath::Power(_b,2)/TMath::Power(2*rAu,2));
 }
 
-Double_t GetEnergy(DataReaderEvent *_event, Double_t _eta)
+Double_t GetEnergy(DataReaderEvent *const &_event, Double_t _eta)
 {
   Double_t energy = 0.;
   Double_t Eta, Pt, P;

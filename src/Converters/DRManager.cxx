@@ -10,18 +10,23 @@ DRManager::~DRManager()
 
 }
 
-Bool_t DRManager::ReadMult(TString _name)
+Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
 {
-  std::cout << "DRManager::ReadFile: Processing." << std::endl;
+  std::cout << "DRManager::ReadMult: Processing." << std::endl;
   if (!InitInputFile(_name))
     return false;
+
+  TH1F* hMult = new TH1F("hMult",Form("Multiplicity within %.1f #eta-cut",eta_cut), 1500,0,1500);
+  Int_t mult = 0;
 
   InitPlotter();
 
   if (fFileType.isASCII && fModelType.isURQMD)
     while (!DRBase::eof())
     {
-      fPlotter->Fill(ReadURQMDEvent(), 1.);
+      mult = 0;
+      mult = fPlotter->GetMultiplicity(ReadURQMDEvent(),eta_cut);
+      hMult->Fill(mult);
     }
 
   if (fFileType.isROOT && fModelType.isPHQMD)
@@ -37,7 +42,8 @@ Bool_t DRManager::ReadMult(TString _name)
     tree->SetBranchAddress("event", &uEvent);
     for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
     {
-      fPlotter->Fill(ReadUNIGENEvent(uEvent, tree, iEvent), 1.);
+      mult = fPlotter->GetMultiplicity(ReadUNIGENEvent(uEvent, tree, iEvent), eta_cut);
+      hMult->Fill(mult);
     }
   }
 
@@ -46,14 +52,16 @@ Bool_t DRManager::ReadMult(TString _name)
     SkipLine(5);
     while (!eof())
     {
-      fPlotter->Fill(ReadLAQGSMEvent(), 1.);
+      mult = fPlotter->GetMultiplicity(ReadLAQGSMEvent(), eta_cut);
+      hMult->Fill(mult);
     }
   }
 
   if (fFileType.isASCII && fModelType.isPHSD)
     while (!eof())
     {
-      fPlotter->Fill(ReadPHSDEvent(), 1.);
+      mult = fPlotter->GetMultiplicity(ReadPHSDEvent(), eta_cut);
+      hMult->Fill(mult);
     }
 
   if (fFileType.isROOT && fModelType.isDCMQGSM)
@@ -69,9 +77,15 @@ Bool_t DRManager::ReadMult(TString _name)
     tree->SetBranchAddress("event", &uEvent);
     for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
     {
-      fPlotter->Fill(ReadUNIGENEvent(uEvent, tree, iEvent), 1.);
+      mult = fPlotter->GetMultiplicity(ReadUNIGENEvent(uEvent, tree, iEvent), eta_cut);
+      hMult->Fill(mult);
     }
   }
+  TFile *outMult = new TFile(_outname.Data(),"recreate");
+  outMult->cd();
+  hMult->Write();
+  outMult->Close();
+
   return true;
 }
 Bool_t DRManager::ReadFile(TString _name)

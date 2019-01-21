@@ -6,5 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class DataReaderPlotter+;
+#pragma link C++ function GetCentrality;
 
 #endif

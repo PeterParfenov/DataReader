@@ -107,6 +107,7 @@ public:
   virtual void InitCuts();
   virtual void InitFlow();
   virtual void DetermineCentrality();
+  virtual Int_t GetMultiplicity(DataReaderEvent *const &_event, Double_t _eta);
 
 private:
   std::map<TString, TH1D *> fHistogramYild;

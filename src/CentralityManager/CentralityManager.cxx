@@ -90,15 +90,16 @@ void CentralityManager::PrintCentrality()
 void CentralityManager::DisectTH1()
 {
 	FillMultBins();
+        const int multiplier = 10;
 
 	if (isDisected) return;
 	hDisected = (TH1F *)hMult->Clone();
 	hDisected->SetName("hDisected");
 
-	TLine *line[NmultiplicityBins];
-	for (int i = 0; i <= NmultiplicityBins; ++i)
+	TLine *line[NmultiplicityBins/multiplier];
+	for (int i = 0; i <= NmultiplicityBins/multiplier; ++i)
 	{
-		line[i] = new TLine(multiplicity_bins[i], 0., multiplicity_bins[i], hDisected->GetBinContent(hDisected->FindBin(multiplicity_bins[i])));
+		line[i] = new TLine(multiplicity_bins[i*multiplier], 0., multiplicity_bins[i*multiplier], hDisected->GetBinContent(hDisected->FindBin(multiplicity_bins[i*multiplier])));
 		hDisected->GetListOfFunctions()->Add(line[i]);
 	}
 	isDisected = true;

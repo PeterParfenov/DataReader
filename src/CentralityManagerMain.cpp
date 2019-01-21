@@ -45,15 +45,15 @@ int main(int argc, char **argv)
 
   TFile* fi = new TFile(inFileName.Data(),"read");
   fi->cd();
-  TH1F* hMult = (TH1F*) fi->Get("hMultPrim");
+  TH1F* hMult = (TH1F*) fi->Get("hMult");
   if (hMult->IsZombie()){
-    std::cerr << "CMMMain: Cannot open TH1 with multiplicity distribution." << std::endl;
+    std::cerr << "CMMain: Cannot open TH1 with multiplicity distribution." << std::endl;
     return 30;
   }
   CentralityManager* centrality = new CentralityManager();
   centrality->SetTH1F(hMult);
   centrality->PrintCentrality();
-  std::cout << "CMMMain: Getting histograms for output" << std::endl;
+  std::cout << "CMMain: Getting histograms for output" << std::endl;
   centrality->DisectTH1();
 
   centrality->WriteTH1(outFileName);

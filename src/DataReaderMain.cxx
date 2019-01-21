@@ -14,9 +14,13 @@ int main(int argc, char **argv)
   Bool_t isTree = false;
   Bool_t isHist = false;
   Bool_t isCentralityMethod = false;
+  Bool_t isMultFill = false;
+
+  const Double_t eta_cut = 0.5;
+
   if (argc < 5)
   {
-    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [OPTIONAL: -Nfiles NFILES, --centrality-method]" << std::endl;
+    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [OPTIONAL: -Nfiles NFILES, --get-multiplicity, --centrality-method]" << std::endl;
     return 10;
   }
 
@@ -25,7 +29,8 @@ int main(int argc, char **argv)
     if (std::string(argv[i]) != "-i" &&
         std::string(argv[i]) != "-o" &&
         std::string(argv[i]) != "-Nfiles" &&
-        std::string(argv[i]) != "--centrality-method")
+        std::string(argv[i]) != "--centrality-method" &&
+        std::string(argv[i]) != "--get-multiplicity")
     {
       std::cerr << "\nDataReaderMain: Unknown parameter: " << i << ": " << argv[i] << std::endl;
       return 10;
@@ -63,6 +68,10 @@ int main(int argc, char **argv)
       {
         isCentralityMethod = true;
       }
+      if (std::string(argv[i]) == "--get-multiplicity")
+      {
+        isMultFill = true;
+      }
     }
   }
 
@@ -78,12 +87,19 @@ int main(int argc, char **argv)
   dR->InitTree("tree", "Basic QA tree");
   // dR->InitDRETree("DRETree", "Basic QA tree w/ DataReaderEvent class");
   if (isCentralityMethod) dR->InitCentralityMethod();
-  dR->ReadFile(inFileName);
-  dR->ScaleYildHists(Norm);
-  if (isTree) dR->InitOutputTreeFile(outFileName);
-  if (isHist) dR->InitOutputHistFile(outFileName);
-  if (isTree) dR->WriteTree();
-  if (isHist) dR->WriteHist();
+  if (!isMultFill)
+  {
+    dR->ReadFile(inFileName);
+    dR->ScaleYildHists(Norm);
+    if (isTree) dR->InitOutputTreeFile(outFileName);
+    if (isHist) dR->InitOutputHistFile(outFileName);
+    if (isTree) dR->WriteTree();
+    if (isHist) dR->WriteHist();
+  }
+  if (isMultFill)
+  {
+    dR->ReadMult(inFileName,outFileName,eta_cut);
+  }
 
   delete dR;
   timer.Stop();
