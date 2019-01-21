@@ -22,6 +22,7 @@
 // #ifdef UNIGEN_INSTALLED
 #include "DRunigen.h"
 // #endif
+#include "DRvsdt.h"
 
 class DRManager : public DRurqmd,
                   public DRlaqgsm,
@@ -29,6 +30,7 @@ class DRManager : public DRurqmd,
                   public DRunigen,
                   // #endif
                   public DRphsd,
+                  public DRvsdt,
                   virtual DRBase
 {
 public:

@@ -16,7 +16,7 @@ Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
   if (!InitInputFile(_name))
     return false;
 
-  TH1F* hMult = new TH1F("hMult",Form("Multiplicity within %.1f #eta-cut",eta_cut), 1500,0,1500);
+  TH1F* hMult = new TH1F("hMult",Form("Multiplicity within %.1f #eta-cut",eta_cut), 2500,0,2500);
   Int_t mult = 0;
 
   InitPlotter();
@@ -43,6 +43,23 @@ Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
     for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
     {
       mult = fPlotter->GetMultiplicity(ReadUNIGENEvent(uEvent, tree, iEvent), eta_cut);
+      hMult->Fill(mult);
+    }
+  }
+
+  if (fFileType.isROOT && fModelType.isVSDT)
+  {
+    TTree *tree;
+    VSDTEvent *vsdtEvent = new VSDTEvent();
+    iFile.ROOT->cd();
+    tree = (TTree *) iFile.ROOT->Get("VSDT");
+    Long_t nentries = tree->GetEntriesFast() / TimeStep;
+
+    std::cout << nentries << std::endl;
+    tree->SetBranchAddress("Event", &vsdtEvent);
+    for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
+    {
+      mult = fPlotter->GetMultiplicity(ReadVSDTEvent(vsdtEvent, tree, iEvent), eta_cut);
       hMult->Fill(mult);
     }
   }
@@ -116,6 +133,22 @@ Bool_t DRManager::ReadFile(TString _name)
     for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
     {
       fPlotter->Fill(ReadUNIGENEvent(uEvent, tree, iEvent), 1.);
+    }
+  }
+
+  if (fFileType.isROOT && fModelType.isVSDT)
+  {
+    TTree *tree;
+    VSDTEvent *vsdtEvent = new VSDTEvent();
+    iFile.ROOT->cd();
+    tree = (TTree *) iFile.ROOT->Get("VSDT");
+    Long_t nentries = tree->GetEntriesFast() / TimeStep;
+
+    std::cout << nentries << std::endl;
+    tree->SetBranchAddress("Event", &vsdtEvent);
+    for (Long_t iEvent = 0; iEvent < nentries; iEvent++)
+    {
+      fPlotter->Fill(ReadVSDTEvent(vsdtEvent, tree, iEvent), 1.);
     }
   }
 

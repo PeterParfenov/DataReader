@@ -10,7 +10,9 @@ Int_t DataReaderPlotter::GetMultiplicity(DataReaderEvent *const &_event, Double_
     Pt = TMath::Sqrt(_event->Px[i] * _event->Px[i] + _event->Py[i] * _event->Py[i]);
     P = TMath::Sqrt(Pt * Pt + _event->Pz[i] * _event->Pz[i]);
     Eta = 0.5 * TMath::Log((P + _event->Pz[i]) / (P - _event->Pz[i]));
-    if (Eta <= _eta)
+    if (!fDB->GetParticle(_event->PID[i])) continue;
+    if (fDB->GetParticle(_event->PID[i])->Charge() <= 0) continue;
+    if (TMath::Abs(Eta) <= _eta)
     {
       mult++;
     }
@@ -51,6 +53,7 @@ DataReaderPlotter::DataReaderPlotter()
   isCutsInitialized = false;
   isFlowInitialized = false;
   isCentralityDetermined = false;
+  fDB = new TDatabasePDG();
 }
 
 void DataReaderPlotter::DetermineCentrality()

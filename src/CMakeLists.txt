@@ -8,7 +8,7 @@ project(DataReader)
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net)
+find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net EG)
 
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
@@ -22,7 +22,7 @@ if(DEFINED ENV{UNIGEN})
   set(UNIGEN_INCLUDE ${UNIGEN_ENV}/base/include)
   set(UNIGEN_LIB_DIR ${UNIGEN_ENV}/lib)
   set(UNIGEN libUniGen.so)
-  #link_directories(${UNIGEN_LIB})
+  #link_directories(${UNIGEN_LIB_DIR})
   find_library(UNIGEN_LIB REQUIRED
     NAMES ${UNIGEN}
     HINTS ${UNIGEN_LIB_DIR} ${UNIGEN_ENV})
@@ -30,6 +30,19 @@ if(DEFINED ENV{UNIGEN})
 else(DEFINED ENV{UNIGEN})
   message(FATAL_ERROR "UniGen not found")
 endif(DEFINED ENV{UNIGEN})
+
+message("checking vsdt:")
+if(DEFINED ENV{VSDT})
+  message("vsdt found: " $ENV{VSDT})
+  set(VSDT_ENV $ENV{VSDT})
+  set(VSDT_LIB libvsdt.so)
+  #link_directories(${VSDT_ENV})
+  find_library(VSDT REQUIRED
+    NAMES ${VSDT_LIB}
+    HINTS ${VSDT_ENV} $ENV{PATH})
+else(DEFINED ENV{VSDT})
+  message(FATAL_ERROR "vsdt is not found")
+endif(DEFINED ENV{VSDT})
 
 set(INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}
@@ -39,6 +52,7 @@ set(INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/CentralityManager
     ${ROOT_INCLUDE_DIRS}
     ${UNIGEN_INCLUDE}
+    ${VSDT_ENV}
 )
 
 include_directories(${INCLUDE_DIRECTORIES}
@@ -63,7 +77,7 @@ add_library(DataReader SHARED
   DataReader.cxx
 G__DataReader.cxx)
 
-target_link_libraries(DataReader Converters ${UNIGEN} ${ROOT_LIBRARIES})
+target_link_libraries(DataReader Converters)
 
 #---Create  a main program using the library
 add_executable(Main DataReaderMain.cxx)

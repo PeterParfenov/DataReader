@@ -3,6 +3,7 @@ set(Converters_header_files
   DRlaqgsm.h
   DRphsd.h
   DRunigen.h
+  DRvsdt.h
   DRBase.h
   DRManager.h
 )
@@ -11,6 +12,7 @@ set(Converters_cxx_files
   DRlaqgsm.cxx
   DRphsd.cxx
   DRunigen.cxx
+  DRvsdt.cxx
   DRBase.cxx
   DRManager.cxx
 )
@@ -24,4 +26,4 @@ add_library(Converters SHARED
 ${Converters_cxx_files}
 G__Converters.cxx)
 
-target_link_libraries(Converters Plotter ${UNIGEN_LIB})
+target_link_libraries(Converters ${UNIGEN_LIB} ${VSDT} Plotter)

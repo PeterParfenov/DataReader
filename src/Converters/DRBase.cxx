@@ -71,7 +71,7 @@ Bool_t DRBase::InitInputFile(TString _name)
   {
     fFileType.isGZ = true;
   }
-  if (_name.Contains("phsd") || _name.Contains("PHSD"))
+  if ((_name.Contains("phsd") || _name.Contains("PHSD")) && (!_name.Contains(".root")))
   {
     fFileType.isASCII = true;
     fModelType.isPHSD = true;
@@ -84,9 +84,13 @@ Bool_t DRBase::InitInputFile(TString _name)
   if (_name.Contains(".root"))
   {
     fFileType.isROOT = true;
-    if (_name.Contains("UNIGEN") || _name.Contains("PHQMD") || _name.Contains("unigen") || _name.Contains("phqmd"))
+    if (_name.Contains("PHQMD") || _name.Contains("phqmd"))
     {
       fModelType.isPHQMD = true;
+    }
+    if (_name.Contains("vsdt") || _name.Contains("VSDT"))
+    {
+      fModelType.isVSDT = true;
     }
     if (_name.Contains("dcmqgsm") || _name.Contains("DCMQGSM"))
     {
@@ -113,6 +117,10 @@ Bool_t DRBase::InitInputFile(TString _name)
   if (fModelType.isDCMQGSM)
   {
     std::cout << "DRBase::InitInputFile: Input model type: DCMQGSM" << std::endl;
+  }
+  if (fModelType.isVSDT)
+  {
+    std::cout << "DRBase::InitInputFile: input model type: VSDT" << std::endl;
   }
   Bool_t result = OpenInputFile(_name);
   return result;

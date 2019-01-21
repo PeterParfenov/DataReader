@@ -32,6 +32,7 @@ struct ModelType
   Bool_t isPHSD;
   Bool_t isPHQMD;
   Bool_t isDCMQGSM;
+  Bool_t isVSDT;
   ClassDef(ModelType, 0);
 };
 
@@ -49,6 +50,8 @@ public:
   virtual Bool_t OpenInputFile(TString _name);
   virtual Bool_t InitInputFile(TString _name);
   virtual void SkipLine(Int_t nLines);
+
+  static const int TimeStep = 1;
 
   FileType fFileType;
   ModelType fModelType;

@@ -14,6 +14,7 @@
 #pragma link C++ class DRunigen+;
 #endif
 
+#pragma link C++ class DRvsdt+;
 #pragma link C++ class DRphsd+;
 #pragma link C++ class DRManager+;
 

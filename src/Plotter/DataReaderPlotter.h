@@ -15,6 +15,7 @@
 #include "TProfile.h"
 #include "TString.h"
 #include "TMath.h"
+#include <TDatabasePDG.h>
 
 #include "DataReaderEvent.h"
 
@@ -88,6 +89,7 @@ const Double_t FlowEtaBinning[] = {-1.5, -1.3, -1.1, -0.9, -0.7, -0.5, -0.3, -0.
 const Double_t FlowRapidityBinning[] = {-1., -0.8, -0.6, -0.4, -0.2, 0., 0.2, 0.4, 0.6, 0.8, 1.};
 const Double_t FlowBBinning[] = {0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12};
 //const Double_t FlowPtBinning[] = {0,0.08,0.16,0.24,0.32,0.4,0.48,0.56,0.64,0.72,0.8,0.88,0.96,1.04,1.12,1.2,1.28,1.36,1.44,1.52,1.6,1.68,1.76,1.84,1.92,2.};
+
 } // namespace dataplotter
 
 using namespace dataplotter;
@@ -131,6 +133,7 @@ private:
   Bool_t isCutsInitialized;
   Bool_t isFlowInitialized;
   Bool_t isCentralityDetermined;
+  TDatabasePDG *fDB;
 
   ClassDef(DataReaderPlotter, 0);
 };

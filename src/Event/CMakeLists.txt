@@ -14,4 +14,4 @@ add_library(Event SHARED
 ${Event_cxx_files}
 G__Event.cxx)
 
-target_link_libraries(Event)
+target_link_libraries(Event ${ROOT_LIBRARIES})

@@ -37,7 +37,7 @@ public:
   DataReaderEvent& operator=(DataReaderEvent& _event);
 
 private:
-  const ULong_t maxCapasity = 2500;
+  const ULong_t maxCapasity = 10000;
   ClassDef(DataReaderEvent, 0);
 };
 
