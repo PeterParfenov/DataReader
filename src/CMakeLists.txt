@@ -8,7 +8,7 @@ project(DataReader)
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 
 #---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net EG)
+find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net EG MathMore)
 
 #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
 include(${ROOT_USE_FILE})
@@ -50,6 +50,8 @@ set(INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/Event
     ${CMAKE_SOURCE_DIR}/Plotter
     ${CMAKE_SOURCE_DIR}/CentralityManager
+    ${CMAKE_SOURCE_DIR}/EPManager
+    ${CMAKE_SOURCE_DIR}/bin
     ${ROOT_INCLUDE_DIRS}
     ${UNIGEN_INCLUDE}
     ${VSDT_ENV}
@@ -66,6 +68,7 @@ add_subdirectory(Event)
 add_subdirectory(Plotter)
 add_subdirectory(Converters)
 add_subdirectory(CentralityManager)
+add_subdirectory(EPManager)
 
 #---Generate dictionary for DataReader
 ROOT_GENERATE_DICTIONARY(G__DataReader
@@ -79,10 +82,4 @@ G__DataReader.cxx)
 
 target_link_libraries(DataReader Converters)
 
-#---Create  a main program using the library
-add_executable(Main DataReaderMain.cxx)
-target_link_libraries(Main DataReader)
-
-#---Create an executable file CentraltyManager
-add_executable(CMMain CentralityManagerMain.cpp)
-target_link_libraries(CMMain CentralityManager)
+add_subdirectory(bin)

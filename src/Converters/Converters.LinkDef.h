@@ -10,9 +10,9 @@
 #pragma link C++ class DRurqmd+;
 #pragma link C++ class DRlaqgsm+;
 
-#ifdef DR_UNIGEN_H
+//#ifdef DR_UNIGEN_H
 #pragma link C++ class DRunigen+;
-#endif
+//#endif
 
 #pragma link C++ class DRvsdt+;
 #pragma link C++ class DRphsd+;
