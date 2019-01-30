@@ -146,6 +146,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
   if (!isMult)
     return false;
 
+  InitPlotter();
+
   fQvCalc = new DRQvCalc();
   fResCalc = new DRResCalc();
   fQvCalc -> SetWeight(true,false,false);
