@@ -146,7 +146,7 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
   if (!isMult)
     return false;
 
-  InitPlotter();
+  // InitPlotter();
 
   fQvCalc = new DRQvCalc();
   fResCalc = new DRResCalc();
@@ -216,6 +216,7 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       event = ReadVSDTEvent(vsdtEvent, tree, iEvent);
       mult = GetMultiplicity(event,0.5);
       cent = GetCentrality(mult);
+      std::cout << mult << " | " << cent << std::endl;
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));

@@ -1,5 +1,19 @@
 #include "DRBase.h"
 
+DRBase::DRBase()
+{
+  fFileType.isASCII = false;
+  fFileType.isGZ = false;
+  fFileType.isROOT = false;
+
+  fModelType.isDCMQGSM = false;
+  fModelType.isLAQGSM = false;
+  fModelType.isPHQMD = false;
+  fModelType.isPHSD = false;
+  fModelType.isURQMD = false;
+  fModelType.isVSDT = false;
+}
+
 std::string DRBase::GetLine()
 {
   std::string str;

@@ -44,7 +44,7 @@ Int_t CentralityManager::GetCentrality(Int_t multiplicity) const
 	int centrality_bin = -1;
 	for (int multiplicityBin = 0; multiplicityBin < NmultiplicityBins; ++multiplicityBin)
 	{
-		if ((multiplicity > (Int_t)multiplicity_bins[multiplicityBin]) && (multiplicity <= (Int_t)multiplicity_bins[multiplicityBin + 1])) //inclusive borders
+		if ((multiplicity <= (Int_t)multiplicity_bins[multiplicityBin]) && (multiplicity > (Int_t)multiplicity_bins[multiplicityBin + 1])) //inclusive borders
 		{
 			if ((multiplicity == (Int_t)multiplicity_bins[multiplicityBin + 1]))
 			{
