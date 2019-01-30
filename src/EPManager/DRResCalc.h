@@ -15,7 +15,7 @@ public:
   virtual ~DRResCalc();
 
   void SetMethod(TString _method);
-  Double_t GetCos(DRQvector *const &qv1, DRQvector *const &qv2);
+  Double_t GetCos(Int_t _harm, DRQvector *const &qv1, DRQvector *const &qv2);
   Double_t GetRes(Double_t _chi, Double_t _harm);
   Double_t GetChi(Double_t _res, Double_t _harm, Int_t accuracy = 50);
 

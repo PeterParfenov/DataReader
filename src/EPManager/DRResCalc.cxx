@@ -23,14 +23,14 @@ void DRResCalc::SetMethod(TString _method)
     is3Sub = true;
 }
 
-Double_t DRResCalc::GetCos(DRQvector *const &qv1, DRQvector *const &qv2)
+Double_t DRResCalc::GetCos(Int_t _harm, DRQvector *const &qv1, DRQvector *const &qv2)
 {
   if (qv1->GetHarm() != qv2->GetHarm())
   {
     std::cerr << "DRResCalc::GetCos: Qv1 and Qv2 have different harmonics! Returning zero..." << std::endl;
     return 0.;
   }
-  return TMath::Cos(qv1->GetHarm() * (qv1->GetPsi() - qv2->GetPsi()));
+  return TMath::Cos(_harm * (qv1->GetPsi() - qv2->GetPsi()));
 }
 
 Double_t DRResCalc::GetRes(Double_t _chi, Double_t _harm)

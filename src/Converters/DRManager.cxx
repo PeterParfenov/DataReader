@@ -127,13 +127,21 @@ std::vector<Double_t> DRManager::GetResEvent(DataReaderEvent *const &_event)
   }
   if (fEtaSubEvent.size() == 2)
   {
-    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(1,Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(2,Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(3,Qv[0],Qv[1]));
   }
   if (fEtaSubEvent.size() == 3)
   {
-    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[1]));
-    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[2]));
-    vCos.push_back(fResCalc->GetCos(Qv[1],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(1,Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(1,Qv[0],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(1,Qv[1],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(2,Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(2,Qv[0],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(2,Qv[1],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(3,Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(3,Qv[0],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(3,Qv[1],Qv[2]));
   }
   return vCos;
 }
@@ -156,10 +164,12 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
   std::vector<Double_t> vCos;
   Int_t mult, cent;
   
-  TProfile *pCorr[fNsubs];
+  TProfile *pCorr[fNsubs], *p2Corr[fNsubs], *p3Corr[fNsubs];
   for (int i=0; i<fNsubs; i++)
   {
     pCorr[i] = new TProfile(Form("pCorr%i",i),Form("Correlation vs centrality %i",i), 10, 0,100);
+    p2Corr[i] = new TProfile(Form("p2Corr%i",i),Form("Correlation 2 vs centrality %i",i), 10, 0,100);
+    p3Corr[i] = new TProfile(Form("p3Corr%i",i),Form("Correlation 3 vs centrality %i",i), 10, 0,100);
     SetEtaSubEvent(etaSubEvent_min[i],etaSubEvent_max[i]);
   }
 
@@ -173,6 +183,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));
+        p2Corr[i] -> Fill(cent,vCos.at(i+3));
+        p3Corr[i] -> Fill(cent,vCos.at(i+6));
       }
     }
 
@@ -196,6 +208,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));
+        p2Corr[i] -> Fill(cent,vCos.at(i+3));
+        p3Corr[i] -> Fill(cent,vCos.at(i+6));
       }
     }
   }
@@ -220,6 +234,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));
+        p2Corr[i] -> Fill(cent,vCos.at(i+3));
+        p3Corr[i] -> Fill(cent,vCos.at(i+6));
       }
     }
   }
@@ -236,6 +252,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));
+        p2Corr[i] -> Fill(cent,vCos.at(i+3));
+        p3Corr[i] -> Fill(cent,vCos.at(i+6));
       }
     }
   }
@@ -250,6 +268,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));
+        p2Corr[i] -> Fill(cent,vCos.at(i+3));
+        p3Corr[i] -> Fill(cent,vCos.at(i+6));
       }
     }
 
@@ -273,6 +293,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
       vCos = GetResEvent(event);
       for (int i=0;i<fNsubs;i++){
         pCorr[i] -> Fill(cent,vCos.at(i));
+        p2Corr[i] -> Fill(cent,vCos.at(i+3));
+        p3Corr[i] -> Fill(cent,vCos.at(i+6));
       }
     }
   }
@@ -281,6 +303,8 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
   for (int i=0; i<fNsubs;i++)
   {
     pCorr[i] -> Write();
+    p2Corr[i] -> Write();
+    p3Corr[i] -> Write();
   }
   outMult->Close();
 
