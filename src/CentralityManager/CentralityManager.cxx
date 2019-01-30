@@ -1,9 +1,29 @@
 #include "CentralityManager.h"
 #include <iostream>
+#include <TMath.h>
 #include "TLine.h"
 #include "TFile.h"
 
 ClassImp(CentralityManager);
+
+Int_t CentralityManager::GetMultiplicity(DataReaderEvent *const &_event, Double_t _eta)
+{
+  Int_t mult = 0;
+  Double_t Eta, Pt, P;
+  for (Int_t i = 0; i < _event->Nparticles; i++)
+  {
+    Pt = TMath::Sqrt(_event->Px[i] * _event->Px[i] + _event->Py[i] * _event->Py[i]);
+    P = TMath::Sqrt(Pt * Pt + _event->Pz[i] * _event->Pz[i]);
+    Eta = 0.5 * TMath::Log((P + _event->Pz[i]) / (P - _event->Pz[i]));
+    if (!fDB->GetParticle(_event->PID[i])) continue;
+    if (fDB->GetParticle(_event->PID[i])->Charge() <= 0) continue;
+    if (TMath::Abs(Eta) <= _eta)
+    {
+      mult++;
+    }
+  }
+  return mult;
+}
 
 Float_t CentralityManager::Integrate(Int_t max_bin, Float_t sum) const
 {
@@ -20,6 +40,7 @@ Float_t CentralityManager::Integrate(Int_t max_bin, Float_t sum) const
 
 Int_t CentralityManager::GetCentrality(Int_t multiplicity) const
 {
+	if (!isMultBinsFilled) FillMultBins();
 	int centrality_bin = -1;
 	for (int multiplicityBin = 0; multiplicityBin < NmultiplicityBins; ++multiplicityBin)
 	{

@@ -5,3 +5,7 @@ target_link_libraries(Main DataReader)
 #---Create an executable file CentraltyManager
 add_executable(CMMain CentralityManagerMain.cpp)
 target_link_libraries(CMMain CentralityManager)
+
+#---Create  a main executable program for CentralityManager
+add_executable(GetMult GetMult.cxx)
+target_link_libraries(GetMult DataReader)

@@ -15,9 +15,9 @@
 #include "TProfile.h"
 #include "TString.h"
 #include "TMath.h"
-#include <TDatabasePDG.h>
 
 #include "DataReaderEvent.h"
+#include "CentralityManager.h"
 
 namespace dataplotter
 {
@@ -95,6 +95,7 @@ const Double_t FlowBBinning[] = {0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11
 using namespace dataplotter;
 
 class DataReaderPlotter
+: public CentralityManager
 {
 public:
   DataReaderPlotter();
@@ -109,7 +110,6 @@ public:
   virtual void InitCuts();
   virtual void InitFlow();
   virtual void DetermineCentrality();
-  virtual Int_t GetMultiplicity(DataReaderEvent *const &_event, Double_t _eta);
 
 private:
   std::map<TString, TH1D *> fHistogramYild;
@@ -133,7 +133,6 @@ private:
   Bool_t isCutsInitialized;
   Bool_t isFlowInitialized;
   Bool_t isCentralityDetermined;
-  TDatabasePDG *fDB;
 
   ClassDef(DataReaderPlotter, 0);
 };

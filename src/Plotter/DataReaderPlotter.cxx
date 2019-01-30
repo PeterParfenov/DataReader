@@ -1,25 +1,6 @@
 #include "DataReaderPlotter.h"
 #include <string>
 
-Int_t DataReaderPlotter::GetMultiplicity(DataReaderEvent *const &_event, Double_t _eta)
-{
-  Int_t mult = 0;
-  Double_t Eta, Pt, P;
-  for (Int_t i = 0; i < _event->Nparticles; i++)
-  {
-    Pt = TMath::Sqrt(_event->Px[i] * _event->Px[i] + _event->Py[i] * _event->Py[i]);
-    P = TMath::Sqrt(Pt * Pt + _event->Pz[i] * _event->Pz[i]);
-    Eta = 0.5 * TMath::Log((P + _event->Pz[i]) / (P - _event->Pz[i]));
-    if (!fDB->GetParticle(_event->PID[i])) continue;
-    if (fDB->GetParticle(_event->PID[i])->Charge() <= 0) continue;
-    if (TMath::Abs(Eta) <= _eta)
-    {
-      mult++;
-    }
-  }
-  return mult;
-}
-
 #ifndef PLOTTERFUNCTIONS
 #define PLOTTERFUNCTIONS
 Double_t GetCentrality(Double_t _b)
@@ -53,7 +34,6 @@ DataReaderPlotter::DataReaderPlotter()
   isCutsInitialized = false;
   isFlowInitialized = false;
   isCentralityDetermined = false;
-  fDB = new TDatabasePDG();
 }
 
 void DataReaderPlotter::DetermineCentrality()
@@ -78,7 +58,7 @@ void DataReaderPlotter::InitYild()
   ValueRangeYild[VariablesName[1]] = {-5., 5.};                   //Eta
   ValueRangeYild[VariablesName[2]] = {-5., 5.};                   //Rapidity
   ValueRangeYild[VariablesName[3]] = {-TMath::Pi(), TMath::Pi()}; //Phi
-  ValueRangeYild[VariablesName[4]] = {0., 15.};                 //Energy in forward rapidity region
+  ValueRangeYild[VariablesName[4]] = {0., 15.};                   //Energy in forward rapidity region
   ValueRangeYild[VariablesName[5]] = {0., 17.};                   //B
   ValueRangeYild[VariablesName[6]] = {0., 2500.};                 //Npart
   ValueRangeYild[VariablesName[7]] = {-TMath::Pi(), TMath::Pi()}; //PsiRP

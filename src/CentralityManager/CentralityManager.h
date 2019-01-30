@@ -5,6 +5,9 @@
 #include "TH1F.h"
 #include "TRandom3.h"
 #include "TString.h"
+#include <TDatabasePDG.h>
+
+#include "DataReaderEvent.h"
 
 class CentralityManager
 {
@@ -18,10 +21,12 @@ Float_t multiplicity_bins[NmultiplicityBins+1];
 Bool_t isMultBinsFilled = false;
 Bool_t isDisected = false;
 
+TDatabasePDG *fDB;
+
 void FillMultBins();
 
 public:
-CentralityManager(){}
+CentralityManager(){fDB = new TDatabasePDG();}
 virtual ~CentralityManager(){}
 
 void SetTH1F(TH1F* hist) { hMult = hist; }
@@ -31,7 +36,7 @@ Int_t GetCentrality(Int_t multiplicity) const;
 void PrintCentrality();
 void DisectTH1();
 void WriteTH1(TString outFileName);
-
+Int_t GetMultiplicity(DataReaderEvent *const &_event, Double_t _eta);
 
 ClassDef(CentralityManager,0);
 };

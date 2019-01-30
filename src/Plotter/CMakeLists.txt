@@ -14,4 +14,4 @@ add_library(Plotter SHARED
 ${Plotter_cxx_files}
 G__Plotter.cxx)
 
-target_link_libraries(Plotter Event)
+target_link_libraries(Plotter CentralityManager)
