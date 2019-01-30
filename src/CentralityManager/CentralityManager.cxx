@@ -40,7 +40,7 @@ Float_t CentralityManager::Integrate(Int_t max_bin, Float_t sum) const
 
 Int_t CentralityManager::GetCentrality(Int_t multiplicity) const
 {
-	if (!isMultBinsFilled) FillMultBins();
+	if (!isMultBinsFilled) return -2;
 	int centrality_bin = -1;
 	for (int multiplicityBin = 0; multiplicityBin < NmultiplicityBins; ++multiplicityBin)
 	{

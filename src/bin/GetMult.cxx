@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     }
   }
   DataReader *dR = new DataReader();
-  dR->InitTree("tree", "Basic QA tree");
+  // dR->InitTree("tree", "Basic QA tree");
   dR->ReadMult(inFileName,outFileName,eta_cut);
 
   delete dR;

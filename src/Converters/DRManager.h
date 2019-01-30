@@ -44,9 +44,9 @@ private:
   Bool_t isMult;
   DRQvCalc *fQvCalc;
   DRResCalc *fResCalc;
-  std::vector < std::pair<Double_t, Double_t> fEtaSubEvent;
+  std::vector < std::pair<Double_t, Double_t>> fEtaSubEvent;
   // Eta cuts for sub-events:
-  const int fNsubs = 3;
+  static const int fNsubs = 3;
   const Double_t etaSubEvent_min[fNsubs] = {-0.8, -0.5, 0.6};
   const Double_t etaSubEvent_max[fNsubs] = {-0.6, 0.5, 0.8};
 

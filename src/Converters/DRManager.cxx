@@ -115,8 +115,9 @@ void DRManager::SetEtaSubEvent(Double_t _eta_min, Double_t _eta_max)
 
 std::vector<Double_t> DRManager::GetResEvent(DataReaderEvent *const &_event)
 {
-  if (fEtaSubEvent.size() == 0) return;
-  if (fEtaSubEvent.size() == 1) return;
+  std::vector<Double_t> vCos;
+  if (fEtaSubEvent.size() == 0) return vCos;
+  if (fEtaSubEvent.size() == 1) return vCos;
   const int Nsub = fEtaSubEvent.size();
   DRQvector *Qv[Nsub];
   for (int i=0;i<Nsub;i++)
@@ -124,16 +125,15 @@ std::vector<Double_t> DRManager::GetResEvent(DataReaderEvent *const &_event)
     Qv[i] = new DRQvector();
     fQvCalc->Calculate(_event,Qv[i],1,fEtaSubEvent.at(i).first,fEtaSubEvent.at(i).second);
   }
-  std::vector<Double_t> vCos;
   if (fEtaSubEvent.size() == 2)
   {
-    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[1]);
+    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[1]));
   }
   if (fEtaSubEvent.size() == 3)
   {
-    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[1]);
-    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[2]);
-    vCos.push_back(fResCalc->GetCos(Qv[1],Qv[2]);
+    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(Qv[0],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(Qv[1],Qv[2]));
   }
   return vCos;
 }
