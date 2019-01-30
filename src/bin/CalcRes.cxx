@@ -120,8 +120,8 @@ int main(int argc, char **argv)
       res = TMath::Sqrt(cor1);
       if (res != 0)
         resErr = corErr1 / (2 * res);
-      //chi = ResCalc->GetChi(res, i, 50);
-      //pRes2Sub[i]->SetBinContent(iBin, ResCalc->GetRes(TMath::Sqrt(2) * chi, i));
+      chi = ResCalc->GetChi(res, i+1, 50);
+      pRes2Sub[i]->SetBinContent(iBin, ResCalc->GetRes(TMath::Sqrt(2) * chi, i+1));
     }
   }
 
