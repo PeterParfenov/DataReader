@@ -42,13 +42,14 @@ class DRManager : public DRurqmd,
 private:
   TH1F *fMult;
   Bool_t isMult;
+  Bool_t isInit;
   DRQvCalc *fQvCalc;
   DRResCalc *fResCalc;
   std::vector < std::pair<Double_t, Double_t>> fEtaSubEvent;
   // Eta cuts for sub-events:
   static const int fNsubs = 3;
-  const Double_t etaSubEvent_min[fNsubs] = {-0.8, -0.5, 0.6};
-  const Double_t etaSubEvent_max[fNsubs] = {-0.6, 0.5, 0.8};
+  const Double_t etaSubEvent_min[fNsubs] = {-4., -0.5, 2.};
+  const Double_t etaSubEvent_max[fNsubs] = {-2., 0.5, 4.};
 
 public:
   DRManager();

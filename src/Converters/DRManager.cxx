@@ -1,23 +1,22 @@
 #include "DRManager.h"
 
 DRManager::DRManager()
-: isMult(false)
+    : isMult(false),
+      isInit(false)
 {
-
 }
 
 DRManager::~DRManager()
 {
-
 }
 
-Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
+Bool_t DRManager::ReadMult(TString _name, TString _outname, Double_t eta_cut)
 {
   std::cout << "DRManager::ReadMult: Processing." << std::endl;
   if (!InitInputFile(_name))
     return false;
 
-  TH1F* hMult = new TH1F("hMult",Form("Multiplicity within %.1f #eta-cut",eta_cut), 2500,0,2500);
+  TH1F *hMult = new TH1F("hMult", Form("Multiplicity within %.1f #eta-cut", eta_cut), 2500, 0, 2500);
   Int_t mult = 0;
 
   InitPlotter();
@@ -26,7 +25,7 @@ Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
     while (!DRBase::eof())
     {
       mult = 0;
-      mult = GetMultiplicity(ReadURQMDEvent(),eta_cut);
+      mult = GetMultiplicity(ReadURQMDEvent(), eta_cut);
       hMult->Fill(mult);
     }
 
@@ -53,7 +52,7 @@ Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
     TTree *tree;
     VSDTEvent *vsdtEvent = new VSDTEvent();
     iFile.ROOT->cd();
-    tree = (TTree *) iFile.ROOT->Get("VSDT");
+    tree = (TTree *)iFile.ROOT->Get("VSDT");
     Long_t nentries = tree->GetEntriesFast() / TimeStep;
 
     std::cout << nentries << std::endl;
@@ -99,7 +98,7 @@ Bool_t DRManager::ReadMult(TString _name,TString _outname, Double_t eta_cut)
       hMult->Fill(mult);
     }
   }
-  TFile *outMult = new TFile(_outname.Data(),"recreate");
+  TFile *outMult = new TFile(_outname.Data(), "recreate");
   outMult->cd();
   hMult->Write();
   outMult->Close();
@@ -116,37 +115,39 @@ void DRManager::SetEtaSubEvent(Double_t _eta_min, Double_t _eta_max)
 std::vector<Double_t> DRManager::GetResEvent(DataReaderEvent *const &_event)
 {
   std::vector<Double_t> vCos;
-  if (fEtaSubEvent.size() == 0) return vCos;
-  if (fEtaSubEvent.size() == 1) return vCos;
+  if (fEtaSubEvent.size() == 0)
+    return vCos;
+  if (fEtaSubEvent.size() == 1)
+    return vCos;
   const int Nsub = fEtaSubEvent.size();
   DRQvector *Qv[Nsub];
-  for (int i=0;i<Nsub;i++)
+  for (int i = 0; i < Nsub; i++)
   {
     Qv[i] = new DRQvector();
-    fQvCalc->Calculate(_event,Qv[i],1,fEtaSubEvent.at(i).first,fEtaSubEvent.at(i).second);
+    fQvCalc->Calculate(_event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
   }
   if (fEtaSubEvent.size() == 2)
   {
-    vCos.push_back(fResCalc->GetCos(1,Qv[0],Qv[1]));
-    vCos.push_back(fResCalc->GetCos(2,Qv[0],Qv[1]));
-    vCos.push_back(fResCalc->GetCos(3,Qv[0],Qv[1]));
+    vCos.push_back(fResCalc->GetCos(1, Qv[0], Qv[1]));
+    vCos.push_back(fResCalc->GetCos(2, Qv[0], Qv[1]));
+    vCos.push_back(fResCalc->GetCos(3, Qv[0], Qv[1]));
   }
   if (fEtaSubEvent.size() == 3)
   {
-    vCos.push_back(fResCalc->GetCos(1,Qv[0],Qv[1]));
-    vCos.push_back(fResCalc->GetCos(1,Qv[0],Qv[2]));
-    vCos.push_back(fResCalc->GetCos(1,Qv[1],Qv[2]));
-    vCos.push_back(fResCalc->GetCos(2,Qv[0],Qv[1]));
-    vCos.push_back(fResCalc->GetCos(2,Qv[0],Qv[2]));
-    vCos.push_back(fResCalc->GetCos(2,Qv[1],Qv[2]));
-    vCos.push_back(fResCalc->GetCos(3,Qv[0],Qv[1]));
-    vCos.push_back(fResCalc->GetCos(3,Qv[0],Qv[2]));
-    vCos.push_back(fResCalc->GetCos(3,Qv[1],Qv[2]));
+    vCos.push_back(fResCalc->GetCos(1, Qv[0], Qv[1]));
+    vCos.push_back(fResCalc->GetCos(1, Qv[0], Qv[2]));
+    vCos.push_back(fResCalc->GetCos(1, Qv[1], Qv[2]));
+    vCos.push_back(fResCalc->GetCos(2, Qv[0], Qv[1]));
+    vCos.push_back(fResCalc->GetCos(2, Qv[0], Qv[2]));
+    vCos.push_back(fResCalc->GetCos(2, Qv[1], Qv[2]));
+    vCos.push_back(fResCalc->GetCos(3, Qv[0], Qv[1]));
+    vCos.push_back(fResCalc->GetCos(3, Qv[0], Qv[2]));
+    vCos.push_back(fResCalc->GetCos(3, Qv[1], Qv[2]));
   }
   return vCos;
 }
 
-Bool_t DRManager::ReadRes(TString _name,TString _outname)
+Bool_t DRManager::ReadRes(TString _name, TString _outname)
 {
   std::cout << "DRManager::GetRes: Processing." << std::endl;
   if (!InitInputFile(_name))
@@ -158,19 +159,27 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
 
   fQvCalc = new DRQvCalc();
   fResCalc = new DRResCalc();
-  fQvCalc -> SetWeight(true,false,false);
+  fQvCalc->SetWeight(true, false, false);
   SetTH1F(fMult);
   PrintCentrality();
   std::vector<Double_t> vCos;
   Int_t mult, cent;
-  
+
   TProfile *pCorr[fNsubs], *p2Corr[fNsubs], *p3Corr[fNsubs];
-  for (int i=0; i<fNsubs; i++)
+  TProfile *pQx[fNsubs], *pQy[fNsubs], *pPsi[fNsubs];
+  TH1F *hQx[fNsubs], *hQy[fNsubs], *hPsi[fNsubs];
+  for (int i = 0; i < fNsubs; i++)
   {
-    pCorr[i] = new TProfile(Form("pCorr%i",i),Form("Correlation vs centrality %i",i), 10, 0,100);
-    p2Corr[i] = new TProfile(Form("p2Corr%i",i),Form("Correlation 2 vs centrality %i",i), 10, 0,100);
-    p3Corr[i] = new TProfile(Form("p3Corr%i",i),Form("Correlation 3 vs centrality %i",i), 10, 0,100);
-    SetEtaSubEvent(etaSubEvent_min[i],etaSubEvent_max[i]);
+    pCorr[i] = new TProfile(Form("pCorr%i", i), Form("Correlation vs centrality %i", i), 10, 0, 100);
+    p2Corr[i] = new TProfile(Form("p2Corr%i", i), Form("Correlation 2 vs centrality %i", i), 10, 0, 100);
+    p3Corr[i] = new TProfile(Form("p3Corr%i", i), Form("Correlation 3 vs centrality %i", i), 10, 0, 100);
+    pQx[i] = new TProfile(Form("pQx%i", i), Form("pQx%i", i), 10,0,100);
+    pQy[i] = new TProfile(Form("pQy%i", i), Form("pQy%i", i), 10,0,100);
+    pPsi[i] = new TProfile(Form("pPsi%i", i), Form("pPsi%i", i), 10,0,100);
+    hQx[i] = new TH1F(Form("hQx%i", i), Form("hQx%i", i), 200, -100, 100);
+    hQy[i] = new TH1F(Form("hQy%i", i), Form("hQy%i", i), 200, -100, 100);
+    hPsi[i] = new TH1F(Form("hPsi%i", i), Form("hPsi%i", i), 200, -5, 5);
+    SetEtaSubEvent(etaSubEvent_min[i], etaSubEvent_max[i]);
   }
 
   if (fFileType.isASCII && fModelType.isURQMD)
@@ -178,13 +187,23 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     {
       DataReaderEvent *event = new DataReaderEvent();
       event = ReadURQMDEvent();
-      mult = GetMultiplicity(event,0.5);
+      mult = GetMultiplicity(event, 0.5);
       cent = GetCentrality(mult);
       vCos = GetResEvent(event);
-      for (int i=0;i<fNsubs;i++){
-        pCorr[i] -> Fill(cent,vCos.at(i));
-        p2Corr[i] -> Fill(cent,vCos.at(i+3));
-        p3Corr[i] -> Fill(cent,vCos.at(i+6));
+
+      DRQvector *Qv[fNsubs];
+      for (int i = 0; i < fNsubs; i++)
+      {
+        Qv[i] = new DRQvector();
+        fQvCalc->Calculate(event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
+
+        pCorr[i]->Fill(cent, vCos.at(i));
+        p2Corr[i]->Fill(cent, vCos.at(i + 3));
+        p3Corr[i]->Fill(cent, vCos.at(i + 6));
+
+        hQx[i]->Fill(Qv[i]->GetX());
+        hQy[i]->Fill(Qv[i]->GetY());
+        hPsi[i]->Fill(Qv[i]->GetPsi());
       }
     }
 
@@ -203,13 +222,26 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     {
       DataReaderEvent *event = new DataReaderEvent();
       event = ReadUNIGENEvent(uEvent, tree, iEvent);
-      mult = GetMultiplicity(event,0.5);
+      mult = GetMultiplicity(event, 0.5);
       cent = GetCentrality(mult);
       vCos = GetResEvent(event);
-      for (int i=0;i<fNsubs;i++){
-        pCorr[i] -> Fill(cent,vCos.at(i));
-        p2Corr[i] -> Fill(cent,vCos.at(i+3));
-        p3Corr[i] -> Fill(cent,vCos.at(i+6));
+      DRQvector *Qv[fNsubs];
+      for (int i = 0; i < fNsubs; i++)
+      {
+        Qv[i] = new DRQvector();
+        fQvCalc->Calculate(event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
+
+        pCorr[i]->Fill(cent, vCos.at(i));
+        p2Corr[i]->Fill(cent, vCos.at(i + 3));
+        p3Corr[i]->Fill(cent, vCos.at(i + 6));
+
+        pQx[i]->Fill(cent,Qv[i]->GetX());
+        pQy[i]->Fill(cent,Qv[i]->GetY());
+        pPsi[i]->Fill(cent,Qv[i]->GetPsi());
+
+        hQx[i]->Fill(Qv[i]->GetX());
+        hQy[i]->Fill(Qv[i]->GetY());
+        hPsi[i]->Fill(Qv[i]->GetPsi());
       }
     }
   }
@@ -219,7 +251,7 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     TTree *tree;
     VSDTEvent *vsdtEvent = new VSDTEvent();
     iFile.ROOT->cd();
-    tree = (TTree *) iFile.ROOT->Get("VSDT");
+    tree = (TTree *)iFile.ROOT->Get("VSDT");
     Long_t nentries = tree->GetEntriesFast() / TimeStep;
 
     std::cout << nentries << std::endl;
@@ -228,14 +260,27 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     {
       DataReaderEvent *event = new DataReaderEvent();
       event = ReadVSDTEvent(vsdtEvent, tree, iEvent);
-      mult = GetMultiplicity(event,0.5);
+      mult = GetMultiplicity(event, 0.5);
       cent = GetCentrality(mult);
       std::cout << mult << " | " << cent << std::endl;
       vCos = GetResEvent(event);
-      for (int i=0;i<fNsubs;i++){
-        pCorr[i] -> Fill(cent,vCos.at(i));
-        p2Corr[i] -> Fill(cent,vCos.at(i+3));
-        p3Corr[i] -> Fill(cent,vCos.at(i+6));
+      DRQvector *Qv[fNsubs];
+      for (int i = 0; i < fNsubs; i++)
+      {
+        Qv[i] = new DRQvector();
+        fQvCalc->Calculate(event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
+
+        pCorr[i]->Fill(cent, vCos.at(i));
+        p2Corr[i]->Fill(cent, vCos.at(i + 3));
+        p3Corr[i]->Fill(cent, vCos.at(i + 6));
+
+        pQx[i]->Fill(cent,Qv[i]->GetX());
+        pQy[i]->Fill(cent,Qv[i]->GetY());
+        pPsi[i]->Fill(cent,Qv[i]->GetPsi());
+
+        hQx[i]->Fill(Qv[i]->GetX());
+        hQy[i]->Fill(Qv[i]->GetY());
+        hPsi[i]->Fill(Qv[i]->GetPsi());
       }
     }
   }
@@ -247,13 +292,26 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     {
       DataReaderEvent *event = new DataReaderEvent();
       event = ReadLAQGSMEvent();
-      mult = GetMultiplicity(event,0.5);
+      mult = GetMultiplicity(event, 0.5);
       cent = GetCentrality(mult);
       vCos = GetResEvent(event);
-      for (int i=0;i<fNsubs;i++){
-        pCorr[i] -> Fill(cent,vCos.at(i));
-        p2Corr[i] -> Fill(cent,vCos.at(i+3));
-        p3Corr[i] -> Fill(cent,vCos.at(i+6));
+      DRQvector *Qv[fNsubs];
+      for (int i = 0; i < fNsubs; i++)
+      {
+        Qv[i] = new DRQvector();
+        fQvCalc->Calculate(event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
+
+        pCorr[i]->Fill(cent, vCos.at(i));
+        p2Corr[i]->Fill(cent, vCos.at(i + 3));
+        p3Corr[i]->Fill(cent, vCos.at(i + 6));
+
+        pQx[i]->Fill(cent,Qv[i]->GetX());
+        pQy[i]->Fill(cent,Qv[i]->GetY());
+        pPsi[i]->Fill(cent,Qv[i]->GetPsi());
+
+        hQx[i]->Fill(Qv[i]->GetX());
+        hQy[i]->Fill(Qv[i]->GetY());
+        hPsi[i]->Fill(Qv[i]->GetPsi());
       }
     }
   }
@@ -263,13 +321,26 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     {
       DataReaderEvent *event = new DataReaderEvent();
       event = ReadPHSDEvent();
-      mult = GetMultiplicity(event,0.5);
+      mult = GetMultiplicity(event, 0.5);
       cent = GetCentrality(mult);
       vCos = GetResEvent(event);
-      for (int i=0;i<fNsubs;i++){
-        pCorr[i] -> Fill(cent,vCos.at(i));
-        p2Corr[i] -> Fill(cent,vCos.at(i+3));
-        p3Corr[i] -> Fill(cent,vCos.at(i+6));
+      DRQvector *Qv[fNsubs];
+      for (int i = 0; i < fNsubs; i++)
+      {
+        Qv[i] = new DRQvector();
+        fQvCalc->Calculate(event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
+
+        pCorr[i]->Fill(cent, vCos.at(i));
+        p2Corr[i]->Fill(cent, vCos.at(i + 3));
+        p3Corr[i]->Fill(cent, vCos.at(i + 6));
+
+        pQx[i]->Fill(cent,Qv[i]->GetX());
+        pQy[i]->Fill(cent,Qv[i]->GetY());
+        pPsi[i]->Fill(cent,Qv[i]->GetPsi());
+
+        hQx[i]->Fill(Qv[i]->GetX());
+        hQy[i]->Fill(Qv[i]->GetY());
+        hPsi[i]->Fill(Qv[i]->GetPsi());
       }
     }
 
@@ -288,23 +359,44 @@ Bool_t DRManager::ReadRes(TString _name,TString _outname)
     {
       DataReaderEvent *event = new DataReaderEvent();
       event = ReadUNIGENEvent(uEvent, tree, iEvent);
-      mult = GetMultiplicity(event,0.5);
+      mult = GetMultiplicity(event, 0.5);
       cent = GetCentrality(mult);
       vCos = GetResEvent(event);
-      for (int i=0;i<fNsubs;i++){
-        pCorr[i] -> Fill(cent,vCos.at(i));
-        p2Corr[i] -> Fill(cent,vCos.at(i+3));
-        p3Corr[i] -> Fill(cent,vCos.at(i+6));
+      DRQvector *Qv[fNsubs];
+      for (int i = 0; i < fNsubs; i++)
+      {
+        Qv[i] = new DRQvector();
+        fQvCalc->Calculate(event, Qv[i], 1, fEtaSubEvent.at(i).first, fEtaSubEvent.at(i).second);
+
+        pCorr[i]->Fill(cent, vCos.at(i));
+        p2Corr[i]->Fill(cent, vCos.at(i + 3));
+        p3Corr[i]->Fill(cent, vCos.at(i + 6));
+
+        pQx[i]->Fill(cent,Qv[i]->GetX());
+        pQy[i]->Fill(cent,Qv[i]->GetY());
+        pPsi[i]->Fill(cent,Qv[i]->GetPsi());
+
+        hQx[i]->Fill(Qv[i]->GetX());
+        hQy[i]->Fill(Qv[i]->GetY());
+        hPsi[i]->Fill(Qv[i]->GetPsi());
       }
     }
   }
-  TFile *outMult = new TFile(_outname.Data(),"recreate");
+  TFile *outMult = new TFile(_outname.Data(), "recreate");
   outMult->cd();
-  for (int i=0; i<fNsubs;i++)
+  for (int i = 0; i < fNsubs; i++)
   {
-    pCorr[i] -> Write();
-    p2Corr[i] -> Write();
-    p3Corr[i] -> Write();
+    pCorr[i]->Write();
+    p2Corr[i]->Write();
+    p3Corr[i]->Write();
+
+    hQx[i]->Write();
+    hQy[i]->Write();
+    hPsi[i]->Write();
+
+    pQx[i]->Write();
+    pQy[i]->Write();
+    pPsi[i]->Write();
   }
   outMult->Close();
 
@@ -347,7 +439,7 @@ Bool_t DRManager::ReadFile(TString _name)
     TTree *tree;
     VSDTEvent *vsdtEvent = new VSDTEvent();
     iFile.ROOT->cd();
-    tree = (TTree *) iFile.ROOT->Get("VSDT");
+    tree = (TTree *)iFile.ROOT->Get("VSDT");
     Long_t nentries = tree->GetEntriesFast() / TimeStep;
 
     std::cout << nentries << std::endl;
@@ -394,13 +486,16 @@ Bool_t DRManager::ReadFile(TString _name)
 
 void DRManager::InitPlotter()
 {
+  if (isInit) return;
   fPlotter = new DataReaderPlotter();
   fPlotter->InitYild();
   fPlotter->InitKinematics();
   fPlotter->InitCuts();
   fPlotter->InitFlow();
+  fPlotter->InitFlowEP();
   if (isCentralityMethod)
     fPlotter->DetermineCentrality();
+  isInit = true;
 }
 
 ClassImp(DRManager);

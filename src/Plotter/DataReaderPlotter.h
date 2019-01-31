@@ -109,13 +109,17 @@ public:
   virtual void InitKinematics();
   virtual void InitCuts();
   virtual void InitFlow();
+  virtual void InitFlowEP();
   virtual void DetermineCentrality();
+  virtual void SetResHist(Int_t iHarm, TH1F *const &hist){ fResHist[iHarm-1] = hist; }
+  //virtual void SetMultHist(TH1F *const &hist){ fMultHist = hist; }
 
 private:
   std::map<TString, TH1D *> fHistogramYild;
   std::vector<std::map<TString, TH1D *>> fHistogramKinematics;
   std::vector<std::map<TString, TH1D *>> fHistogramCuts;
   std::vector<std::map<TString, TProfile *>> fHistogramFlow;
+  std::vector<std::map<TString, TProfile *>> fHistogramFlowEP;
   std::vector<std::map<TString, TH2D *>> fHistogramKinematics2D;
   std::vector<std::map<TString, TH2D *>> fHistogramCuts2D;
   std::map<TString, std::pair<Double_t, Double_t>> ValueRangeYild;
@@ -132,7 +136,10 @@ private:
   Bool_t isKinematicsInitialized;
   Bool_t isCutsInitialized;
   Bool_t isFlowInitialized;
+  Bool_t isFlowEPInitialized;
   Bool_t isCentralityDetermined;
+  TH1F* fResHist[3];
+  //TH1F* fMultHist;
 
   ClassDef(DataReaderPlotter, 0);
 };

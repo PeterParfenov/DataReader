@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 
   std::cout << "DataReaderMain: Processing." << std::endl;
 
-  TString inFileName, outFileName;
+  TString inFileName, outFileName, resFileName = "", multFileName = "";
   Double_t Norm = 1.;
   Bool_t isTree = false;
   Bool_t isHist = false;
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
   if (argc < 5)
   {
-    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [OPTIONAL: -Nfiles NFILES, --get-multiplicity, --centrality-method]" << std::endl;
+    std::cerr << "./Main -i INPUTFILE -o OUTPUTFILE [OPTIONAL: -Nfiles NFILES, --get-multiplicity, --centrality-method -res RESFILE -mult MULTFILE]" << std::endl;
     return 10;
   }
 
@@ -30,7 +30,9 @@ int main(int argc, char **argv)
         std::string(argv[i]) != "-o" &&
         std::string(argv[i]) != "-Nfiles" &&
         std::string(argv[i]) != "--centrality-method" &&
-        std::string(argv[i]) != "--get-multiplicity")
+        std::string(argv[i]) != "--get-multiplicity" &&
+        std::string(argv[i]) != "-res" &&
+        std::string(argv[i]) != "-mult")
     {
       std::cerr << "\nDataReaderMain: Unknown parameter: " << i << ": " << argv[i] << std::endl;
       return 10;
@@ -72,6 +74,24 @@ int main(int argc, char **argv)
       {
         isMultFill = true;
       }
+      if (std::string(argv[i]) == "-mult" && i != argc - 1)
+      {
+        multFileName = argv[++i];
+      }
+      if (std::string(argv[i]) == "-mult" && i == argc - 1)
+      {
+        std::cerr << "\nDataReaderMain: Multiplicity file name was not specified!" << std::endl;
+        return 23;
+      }
+      if (std::string(argv[i]) == "-res" && i != argc - 1)
+      {
+        resFileName = argv[++i];
+      }
+      if (std::string(argv[i]) == "-res" && i == argc - 1)
+      {
+        std::cerr << "\nDataReaderMain: Resolution file name was not specified!" << std::endl;
+        return 20;
+      }
     }
   }
 
@@ -84,8 +104,21 @@ int main(int argc, char **argv)
   }
 
   DataReader *dR = new DataReader();
+  dR->InitPlotter();
   dR->InitTree("tree", "Basic QA tree");
   // dR->InitDRETree("DRETree", "Basic QA tree w/ DataReaderEvent class");
+  TFile *multFile;
+  if (multFileName != ""){
+    multFile = new TFile(multFileName.Data(),"read");
+    dR->SetMult((TH1F*) multFile->Get("hMult"));
+  }
+  TFile *resFile;
+  if (resFileName != ""){
+    resFile = new TFile(resFileName.Data(),"read");
+    dR->SetRes(1,(TH1F*) resFile->Get("pRes2Sub0"));
+    dR->SetRes(2,(TH1F*) resFile->Get("pRes2Sub1"));
+    dR->SetRes(3,(TH1F*) resFile->Get("pRes2Sub2"));
+  }
   if (isCentralityMethod) dR->InitCentralityMethod();
   if (!isMultFill)
   {

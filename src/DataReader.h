@@ -36,6 +36,7 @@ public:
   virtual void WriteTree();
   virtual void WriteHist();
   virtual void InitCentralityMethod();
+  virtual void SetRes(Int_t i, TH1F *const &hist);
 
 private:
   void FillTree();

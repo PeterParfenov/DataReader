@@ -130,4 +130,9 @@ void DataReader::WriteHist()
   }
 }
 
+void DataReader::SetRes(Int_t i, TH1F *const &hist)
+{
+  fPlotter->SetResHist(i,hist);
+}
+
 ClassImp(DataReader);

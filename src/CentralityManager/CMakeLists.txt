@@ -16,4 +16,4 @@ add_library(CentralityManager SHARED
   ${CentralityManager_cxx_files}
 G__CentralityManager.cxx)
 
-target_link_libraries(CentralityManager Event ${ROOT_LIBRARIES})
+target_link_libraries(CentralityManager Event)
